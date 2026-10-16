@@ -37,7 +37,9 @@ import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
 
 @Composable
-fun BanqueteriaScreen(){
+fun BanqueteriaScreen(
+    onNavigateToLogin: ()-> Unit,
+){
     val context = LocalContext.current
     Scaffold(
         topBar ={ Header(title = "Paolicias.Sweet App") },
@@ -68,11 +70,11 @@ fun BanqueteriaScreen(){
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
-                    onClick = {
+                    onClick = {onNavigateToLogin()
                         Toast.makeText(context,"Bienvenido usuario", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
+                        .fillMaxWidth(0.5f)
                         .height(56.dp)
                         .shadow(8.dp, shape = CircleShape),
                     colors = ButtonDefaults.buttonColors(
@@ -96,5 +98,5 @@ fun BanqueteriaScreen(){
 @Preview(showBackground = true)
 @Composable
 fun BanqueteriaScreenPreview(){
-    BanqueteriaScreen()
+    BanqueteriaScreen{}
 }

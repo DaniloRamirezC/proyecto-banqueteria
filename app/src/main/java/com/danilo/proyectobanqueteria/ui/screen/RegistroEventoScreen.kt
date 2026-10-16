@@ -2,6 +2,12 @@ package com.danilo.proyectobanqueteria.ui.screen
 
 import android.app.DatePickerDialog
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,11 +61,13 @@ fun RegistroScreen(){
 
     var nombre by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
+    var empresa by remember { mutableStateOf("") }
     var tipoEvento by remember { mutableStateOf("") }
     var desplegar by remember { mutableStateOf(false) }
     var fecha by remember { mutableStateOf("") }
     var asistentes by remember { mutableStateOf("") }
     var observaciones by remember { mutableStateOf("") }
+    var errorAsistentes by remember { mutableStateOf(true) }
 
     val listarEventos = listOf("Almuerzo corporativo","Matrimonios","Cumpleaños","Almuerzo o cena de gala","Cóctel","Coffee break")
 
@@ -219,19 +227,39 @@ fun RegistroScreen(){
                 )
                 OutlinedTextField(
                     value = asistentes,
-                    onValueChange = {asistentes = it},
+                    onValueChange = {asistentes = it
+                                    if (errorAsistentes) errorAsistentes = false},
                     singleLine = true,
+                    isError = errorAsistentes,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("80", color = Color.Gray)},
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFFF57E41),
+                        errorBorderColor = Color(0xFFB00020),
+                        errorContainerColor = Color(0xFFFCE8E6)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
                 )
+                AnimatedVisibility(
+                    visible = errorAsistentes,
+                    enter = fadeIn(animationSpec = tween(300)) + expandVertically(),
+                    exit = fadeOut(animationSpec = tween(200)) + shrinkVertically()
+                ) {
+                    Text(
+                        text = "Debe ingresar entre 20 y 100 asistentes",
+                        color = Color(0xFF8B0000),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp,4.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "Observaciones",
@@ -254,10 +282,27 @@ fun RegistroScreen(){
                 Button(
                     onClick = {
                         val cantidad = asistentes.toIntOrNull()
-                        if(cantidad!=null && cantidad>20 && cantidad<100){
-                            Toast.makeText(context,"Cantidad válida: $cantidad", Toast.LENGTH_SHORT)
-                        }else{
-                            Toast.makeText(context,"Cantidad de asistentes debe ser mayor a 20 y menor a 100", Toast.LENGTH_SHORT).show()
+                        when{
+                            nombre.isBlank() ->{
+                                Toast.makeText(context,"Por favor, ingresa el nombre", Toast.LENGTH_SHORT).show()
+                            }
+                            rut.isBlank() ->{
+                                Toast.makeText(context,"Por favor, ingresa el RUT", Toast.LENGTH_SHORT).show()
+                            }
+                            tipoEvento.isBlank() ->{
+                                Toast.makeText(context,"Por favor, selecciona un tipo de evento", Toast.LENGTH_SHORT).show()
+                            }
+                            fecha.isBlank() ->{
+                                Toast.makeText(context,"Por favor, selecciona una fecha", Toast.LENGTH_SHORT).show()
+                            }
+                            cantidad == null || cantidad<=20 || cantidad>=100 ->{
+                                errorAsistentes = true
+                                Toast.makeText(context,"Cantidad de asistentes debe ser entre 20 y 100", Toast.LENGTH_SHORT).show()
+                            }
+                            else ->{
+                                errorAsistentes = false
+                                Toast.makeText(context,"Evento validado con éxito", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     },
                     modifier = Modifier
