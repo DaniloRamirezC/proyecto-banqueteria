@@ -56,12 +56,14 @@ import com.danilo.proyectobanqueteria.ui.components.Header
 import java.util.Calendar
 
 @Composable
-fun RegistroScreen(){
+fun RegistroEventoScreen(){
     val context = LocalContext.current
 
     var nombre by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var empresa by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var tipoEvento by remember { mutableStateOf("") }
     var desplegar by remember { mutableStateOf(false) }
     var fecha by remember { mutableStateOf("") }
@@ -69,7 +71,7 @@ fun RegistroScreen(){
     var observaciones by remember { mutableStateOf("") }
     var errorAsistentes by remember { mutableStateOf(true) }
 
-    val listarEventos = listOf("Almuerzo corporativo","Matrimonios","Cumpleaños","Almuerzo o cena de gala","Cóctel","Coffee break")
+    val listarEventos = listOf("Almuerzo corporativo","Matrimonios","Cumpleaños","Almuerzo/cena de gala","Cóctel","Coffee break","Otro")
 
     val seleccionarFecha = remember { val calendario = Calendar.getInstance()
         val anio = calendario.get(Calendar.YEAR)
@@ -142,6 +144,66 @@ fun RegistroScreen(){
                         .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Empresa",
+                    fontWeight = FontWeight.Bold
+                )
+                OutlinedTextField(
+                    value = empresa,
+                    onValueChange = {empresa = it},
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = {Text("Opcional", color = Color.Gray)},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFE2E2E2),
+                        unfocusedContainerColor = Color(0xFFE2E2E2),
+                        focusedBorderColor = Color(0xFFF57E41),
+                        unfocusedBorderColor = Color(0xFFF57E41)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Teléfono",
+                    fontWeight = FontWeight.Bold
+                )
+                OutlinedTextField(
+                    value = telefono,
+                    onValueChange = {telefono = it},
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = {Text("+5691234567", color = Color.Gray)},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFE2E2E2),
+                        unfocusedContainerColor = Color(0xFFE2E2E2),
+                        focusedBorderColor = Color(0xFFF57E41),
+                        unfocusedBorderColor = Color(0xFFF57E41)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Email",
+                    fontWeight = FontWeight.Bold
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {email = it},
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = {Text("example@email.com", color = Color.Gray)},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFE2E2E2),
+                        unfocusedContainerColor = Color(0xFFE2E2E2),
+                        focusedBorderColor = Color(0xFFF57E41),
+                        unfocusedBorderColor = Color(0xFFF57E41)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
                     text = "Tipo de evento",
                     fontWeight = FontWeight.Bold
@@ -289,6 +351,12 @@ fun RegistroScreen(){
                             rut.isBlank() ->{
                                 Toast.makeText(context,"Por favor, ingresa el RUT", Toast.LENGTH_SHORT).show()
                             }
+                            telefono.isBlank() ->{
+                                Toast.makeText(context,"Por favor, ingresa el teléfono", Toast.LENGTH_SHORT).show()
+                            }
+                            email.isBlank() ->{
+                                Toast.makeText(context,"Por favor, ingresa el email", Toast.LENGTH_SHORT).show()
+                            }
                             tipoEvento.isBlank() ->{
                                 Toast.makeText(context,"Por favor, selecciona un tipo de evento", Toast.LENGTH_SHORT).show()
                             }
@@ -367,6 +435,6 @@ fun RegistroScreen(){
 }
 @Preview(showBackground = true)
 @Composable
-fun RegistroScreenPreview(){
-    RegistroScreen()
+fun RegistroEventoScreenPreview(){
+    RegistroEventoScreen()
 }
