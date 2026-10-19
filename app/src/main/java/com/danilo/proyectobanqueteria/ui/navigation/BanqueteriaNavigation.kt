@@ -11,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.danilo.proyectobanqueteria.ui.screen.BanqueteriaScreen
+import com.danilo.proyectobanqueteria.ui.screen.LoginScreen
+import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
 
 object Routes{
     const val BANQUETER = "Banqueteria"
@@ -63,9 +65,19 @@ fun BanqueteriaNavigation(){
             )
         }
         composable(Routes.REGISTER_USER){
+            RegisterScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.LOGIN)
+                }
+            )
 
         }
         composable(Routes.LOGIN) {
+            LoginScreen(
+                onNavigateToRegister = {
+                    navController.navigate(Routes.REGISTER_USER)
+                }
+            )
 
         }
         composable(Routes.CATALOG){
