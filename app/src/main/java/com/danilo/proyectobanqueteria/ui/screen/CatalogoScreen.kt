@@ -49,7 +49,7 @@ private val fondo = Color(0xFFE6C196)
 private val crema = Color(0xFFFFF8EF)
 
 @Composable
-fun CatalogoScreen(onCotizar: () -> Unit) {
+fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
     Scaffold(
         topBar = { Header(title = "Catálogo de menús") },
         bottomBar = { Footer() },
@@ -101,7 +101,7 @@ fun CatalogoScreen(onCotizar: () -> Unit) {
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
-                                onClick = onCotizar,
+                                onClick = {onNavigateToCotizar()},
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = terracota, contentColor = Color.White)
@@ -127,5 +127,5 @@ fun CatalogoScreen(onCotizar: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun CatalogoScreenPreview() {
-    CatalogoScreen(onCotizar = {})
+    CatalogoScreen(onNavigateToCotizar = {})
 }

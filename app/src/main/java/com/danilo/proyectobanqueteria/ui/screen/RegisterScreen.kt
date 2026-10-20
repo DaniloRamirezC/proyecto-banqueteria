@@ -21,11 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
-import com.danilo.proyectobanqueteria.ui.viewmodel.RegisterViewModel
+import com.danilo.proyectobanqueteria.ui.viewModel.RegisterViewModel
 
 @Composable
 
@@ -112,7 +113,7 @@ fun RegisterScreen(
                     viewModel.onRegisterClick{
                         Toast.makeText(
                             context,
-                            "!Registro exitoso¡ Por favor inicia sesión",
+                            "¡Registro exitoso! Por favor inicia sesión",
                             Toast.LENGTH_SHORT
                         ).show()
                         onNavigateToLogin()
@@ -125,4 +126,9 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview(){
+    RegisterScreen( {})
 }

@@ -18,11 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
-import com.danilo.proyectobanqueteria.ui.viewmodel.LoginViewModel
+import com.danilo.proyectobanqueteria.ui.viewModel.LoginViewModel
 
 @Composable
 fun LoginScreen(
@@ -87,3 +88,9 @@ fun LoginScreen(
         }
     }
 }
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen({})
+}
+

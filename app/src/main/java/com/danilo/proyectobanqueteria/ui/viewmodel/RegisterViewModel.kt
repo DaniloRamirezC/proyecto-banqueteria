@@ -1,4 +1,4 @@
-package com.danilo.proyectobanqueteria.ui.viewmodel
+package com.danilo.proyectobanqueteria.ui.viewModel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf

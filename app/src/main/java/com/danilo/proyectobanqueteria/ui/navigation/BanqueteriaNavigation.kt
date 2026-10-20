@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.danilo.proyectobanqueteria.ui.screen.BanqueteriaScreen
+import com.danilo.proyectobanqueteria.ui.screen.CatalogoScreen
 import com.danilo.proyectobanqueteria.ui.screen.LoginScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
 
@@ -59,8 +60,10 @@ fun BanqueteriaNavigation(){
     ){
         composable(Routes.BANQUETER){
             BanqueteriaScreen(
-                onNavigateToLogin = {
-                    navController.navigate(Routes.LOGIN)
+                onNavigateToRegister = {
+                    navController.navigate(Routes.REGISTER_USER){
+                        popUpTo(Routes.REGISTER_USER) {inclusive = true}
+                    }
                 }
             )
         }
@@ -81,8 +84,14 @@ fun BanqueteriaNavigation(){
 
         }
         composable(Routes.CATALOG){
+            CatalogoScreen(
+                onNavigateToCotizar = {
+                    navController.navigate(Routes.REGISTER_EVENT)
+                }
+            )
+        }
+        composable(Routes.REGISTER_EVENT){
 
         }
-        composable(Routes.REGISTER_EVENT){  }
     }
 }

@@ -51,27 +51,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
+import com.danilo.proyectobanqueteria.ui.viewModel.EventoViewModel
 import java.util.Calendar
 
 @Composable
-fun RegistroEventoScreen(){
+fun RegistroEventoScreen(
+    viewModel: EventoViewModel = viewModel(),
+    onNavigateToResumen: ()-> Unit
+){
     val context = LocalContext.current
+    val state = viewModel.uiState
 
-    var nombre by remember { mutableStateOf("") }
-    var rut by remember { mutableStateOf("") }
-    var empresa by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var tipoEvento by remember { mutableStateOf("") }
     var desplegar by remember { mutableStateOf(false) }
-    var fecha by remember { mutableStateOf("") }
-    var asistentes by remember { mutableStateOf("") }
-    var observaciones by remember { mutableStateOf("") }
-    var errorAsistentes by remember { mutableStateOf(true) }
-
-    val listarEventos = listOf("Almuerzo corporativo","Matrimonios","Cumpleaños","Almuerzo/cena de gala","Cóctel","Coffee break","Otro")
+    val listarEventos = listOf("Cóctel","Celebración","Matrimonio","Empresarial","Coffee Break","Otro")
 
     val seleccionarFecha = remember { val calendario = Calendar.getInstance()
         val anio = calendario.get(Calendar.YEAR)
@@ -81,7 +76,7 @@ fun RegistroEventoScreen(){
         DatePickerDialog(
             context,
             {_,year,month,dayOfMonth ->
-                fecha = "$dayOfMonth/${month+1}/$year"
+                viewModel.onfechaChanged("$dayOfMonth/${month+1}/$year")
             },
             anio,mes,dia)
     }
@@ -110,8 +105,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = nombre,
-                    onValueChange = {nombre = it},
+                    value = state.nombre,
+                    onValueChange = {viewModel.onNombreChanged(it)},
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -129,8 +124,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = rut,
-                    onValueChange = {rut = it},
+                    value = state.rut,
+                    onValueChange = {viewModel.onRutChanged(it)},
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("12345678-9", color = Color.Gray)},
@@ -150,8 +145,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = empresa,
-                    onValueChange = {empresa = it},
+                    value = state.empresa,
+                    onValueChange = {viewModel.onEmpresaChanged(it)},
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("Opcional", color = Color.Gray)},
@@ -170,8 +165,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = telefono,
-                    onValueChange = {telefono = it},
+                    value = state.telefono,
+                    onValueChange = {viewModel.onTelefonoChanged(it)},
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("+5691234567", color = Color.Gray)},
@@ -189,8 +184,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = {email = it},
+                    value = state.email,
+                    onValueChange = {viewModel.onEmailChanged(it)},
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("example@email.com", color = Color.Gray)},
@@ -213,7 +208,7 @@ fun RegistroEventoScreen(){
                         .fillMaxWidth()
                 ){
                     OutlinedTextField(
-                        value = tipoEvento,
+                        value = state.tipoEvento,
                         onValueChange = {},
                         singleLine = true,
                         readOnly = true,
@@ -245,7 +240,7 @@ fun RegistroEventoScreen(){
                             DropdownMenuItem(
                                 text = {Text(opcion)},
                                 onClick = {
-                                    tipoEvento = opcion
+                                    viewModel.onTipoEventoChanged(opcion)
                                     desplegar = false
                                 }
                             )
@@ -258,7 +253,7 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = fecha,
+                    value = state.fecha,
                     onValueChange = {},
                     singleLine = true,
                     readOnly = true,
@@ -281,6 +276,7 @@ fun RegistroEventoScreen(){
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable {seleccionarFecha.show()}
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -288,11 +284,10 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = asistentes,
-                    onValueChange = {asistentes = it
-                                    if (errorAsistentes) errorAsistentes = false},
+                    value = if(state.asistentes==0) "" else state.asistentes.toString(),
+                    onValueChange = {viewModel.onAsistentes(it)},
                     singleLine = true,
-                    isError = errorAsistentes,
+                    isError = viewModel.errorAsistentes,
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {Text("80", color = Color.Gray)},
                     colors = OutlinedTextFieldDefaults.colors(
@@ -307,7 +302,7 @@ fun RegistroEventoScreen(){
                         .fillMaxWidth()
                 )
                 AnimatedVisibility(
-                    visible = errorAsistentes,
+                    visible = viewModel.errorAsistentes,
                     enter = fadeIn(animationSpec = tween(300)) + expandVertically(),
                     exit = fadeOut(animationSpec = tween(200)) + shrinkVertically()
                 ) {
@@ -328,8 +323,8 @@ fun RegistroEventoScreen(){
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
-                    value = observaciones,
-                    onValueChange = {observaciones = it},
+                    value = state.observaciones,
+                    onValueChange = {viewModel.onObservacionesChanged(it)},
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFFE2E2E2),
@@ -343,35 +338,13 @@ fun RegistroEventoScreen(){
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
-                        val cantidad = asistentes.toIntOrNull()
-                        when{
-                            nombre.isBlank() ->{
-                                Toast.makeText(context,"Por favor, ingresa el nombre", Toast.LENGTH_SHORT).show()
+                        viewModel.onConfirmarClick(
+                            onSuccess = {Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
+                                onNavigateToResumen()},
+                            onError = {mensajeError ->
+                                Toast.makeText(context,mensajeError, Toast.LENGTH_SHORT).show()
                             }
-                            rut.isBlank() ->{
-                                Toast.makeText(context,"Por favor, ingresa el RUT", Toast.LENGTH_SHORT).show()
-                            }
-                            telefono.isBlank() ->{
-                                Toast.makeText(context,"Por favor, ingresa el teléfono", Toast.LENGTH_SHORT).show()
-                            }
-                            email.isBlank() ->{
-                                Toast.makeText(context,"Por favor, ingresa el email", Toast.LENGTH_SHORT).show()
-                            }
-                            tipoEvento.isBlank() ->{
-                                Toast.makeText(context,"Por favor, selecciona un tipo de evento", Toast.LENGTH_SHORT).show()
-                            }
-                            fecha.isBlank() ->{
-                                Toast.makeText(context,"Por favor, selecciona una fecha", Toast.LENGTH_SHORT).show()
-                            }
-                            cantidad == null || cantidad<=20 || cantidad>=100 ->{
-                                errorAsistentes = true
-                                Toast.makeText(context,"Cantidad de asistentes debe ser entre 20 y 100", Toast.LENGTH_SHORT).show()
-                            }
-                            else ->{
-                                errorAsistentes = false
-                                Toast.makeText(context,"Evento validado con éxito", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
@@ -436,5 +409,5 @@ fun RegistroEventoScreen(){
 @Preview(showBackground = true)
 @Composable
 fun RegistroEventoScreenPreview(){
-    RegistroEventoScreen()
+    RegistroEventoScreen{}
 }

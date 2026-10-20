@@ -38,7 +38,7 @@ import com.danilo.proyectobanqueteria.ui.components.Header
 
 @Composable
 fun BanqueteriaScreen(
-    onNavigateToLogin: ()-> Unit,
+    onNavigateToRegister: ()-> Unit,
 ){
     val context = LocalContext.current
     Scaffold(
@@ -70,7 +70,7 @@ fun BanqueteriaScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
-                    onClick = {onNavigateToLogin()
+                    onClick = {onNavigateToRegister()
                         Toast.makeText(context,"Bienvenido usuario", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier
