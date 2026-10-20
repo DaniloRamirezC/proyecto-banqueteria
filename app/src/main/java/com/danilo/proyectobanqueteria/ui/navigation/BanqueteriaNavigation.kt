@@ -63,7 +63,7 @@ fun BanqueteriaNavigation(){
         composable(Routes.BANQUETER){
             BanqueteriaScreen(
                 onNavigateToRegister = {
-                    navController.navigate(Routes.REGISTER_USER){
+                    navController.navigate(Routes.LOGIN){
                         popUpTo(Routes.BANQUETER) {inclusive = true}
                     }
                 }
@@ -99,9 +99,9 @@ fun BanqueteriaNavigation(){
         }
         composable(Routes.REGISTER_EVENT){
             RegistroEventoScreen(
-                /*onNavigateToResumen = {
+                onNavigateToResumen = {
                     navController.navigate(Routes.RESUME)
-                },*/
+                },
                 onNavigateToCatalogo = {
                     navController.navigate(Routes.CATALOG)
                 }

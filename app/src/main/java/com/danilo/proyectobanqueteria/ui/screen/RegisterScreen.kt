@@ -39,7 +39,7 @@ fun RegisterScreen(
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { Header("REGISTRO DE USUARIO") },
+        topBar = { Header("Registro de usuario") },
         bottomBar = { Footer() }
 
     ) {innerPadding ->
@@ -51,7 +51,7 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("R e g i s t r o", style = MaterialTheme.typography.headlineMedium)
+            Text("Registro", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(16.dp))
 

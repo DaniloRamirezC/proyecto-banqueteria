@@ -50,7 +50,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("L o g i n", style = MaterialTheme.typography.headlineMedium)
+            Text("Login", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -112,7 +112,7 @@ fun LoginScreen(
                     contentColor = Color.White
                 )
             ) {
-                Text("Ir a Registro")
+                Text("¿No tienes cuenta? Regístrate")
             }
         }
     }

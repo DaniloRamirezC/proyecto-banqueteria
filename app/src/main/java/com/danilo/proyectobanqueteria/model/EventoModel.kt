@@ -10,6 +10,7 @@ data class EventoModel(
     val email: String = "",
     val tipoEvento: String = "",
     val fecha: String = "",
+    val horario: String = "",
     val asistentes: Int = 0,
     val observaciones: String = ""
 ){
@@ -19,7 +20,7 @@ data class EventoModel(
             "Matrimonio" -> 35000
             "Empresarial" -> 18500
             "Coffe Break" -> 8500
-            else -> 15000
+            else -> 0
         }
     val totalEvento: Int = (precioPersona * 1.19 * asistentes).roundToInt()
 }

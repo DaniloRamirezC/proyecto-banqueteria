@@ -33,15 +33,36 @@ private data class MenuBanqueteria(
     val emoji: String,
     val nombre: String,
     val descripcion: String,
-    val incluye: List<String>
+    val incluye: List<String>,
+    val precio: String,
 )
 
 private val menus = listOf(
-    MenuBanqueteria("🥂", "Menú Cóctel", "Ideal para recepciones, inauguraciones y celebraciones de pie.", listOf("Canapés variados", "Mini sándwiches", "Empanaditas de cóctel", "Bocaditos dulces y bebidas a definir")),
-    MenuBanqueteria("🎉", "Menú Celebración", "Una alternativa para cumpleaños, aniversarios y reuniones familiares.", listOf("Cóctel de bienvenida", "Plato principal con acompañamiento", "Ensaladas surtidas", "Postre individual")),
-    MenuBanqueteria("💍", "Menú Matrimonio", "Una propuesta especial para compartir un día inolvidable.", listOf("Recepción de invitados", "Entrada o cóctel", "Plato principal a elección", "Mesa dulce y servicio de bebidas a cotizar")),
-    MenuBanqueteria("🍽️", "Menú Empresarial", "Pensado para almuerzos corporativos, cenas y eventos de empresa.", listOf("Entrada o ensalada", "Plato principal", "Postre", "Opciones de café y bebidas")),
-    MenuBanqueteria("☕", "Menú Coffee Break", "Perfecto para reuniones, capacitaciones y jornadas de trabajo.", listOf("Café y té", "Jugos o agua", "Mini pastelería", "Opciones dulces y saladas"))
+    MenuBanqueteria("🥂",
+        "Menú Cóctel",
+        "Ideal para recepciones, inauguraciones y celebraciones de pie.",
+        listOf("Canapés variados", "Mini sándwiches", "Empanaditas de cóctel", "Bocaditos dulces y bebidas a definir"),
+        "$14.000 por persona (IVA incluído)"),
+    MenuBanqueteria("🎉",
+        "Menú Celebración",
+        "Una alternativa para cumpleaños, aniversarios y reuniones familiares.",
+        listOf("Cóctel de bienvenida", "Plato principal con acompañamiento", "Ensaladas surtidas", "Postre individual"),
+        "$20.000 por persona (IVA incluído)"),
+    MenuBanqueteria("💍",
+        "Menú Matrimonio",
+        "Una propuesta especial para compartir un día inolvidable.",
+        listOf("Recepción de invitados", "Entrada o cóctel", "Plato principal a elección", "Mesa dulce y servicio de bebidas a cotizar"),
+        "$35.000 por persona (IVA incluído)"),
+    MenuBanqueteria("🍽️",
+        "Menú Empresarial",
+        "Pensado para almuerzos corporativos, cenas y eventos de empresa.",
+        listOf("Entrada o ensalada", "Plato principal", "Postre", "Opciones de café y bebidas"),
+        "$18.500 por persona (IVA incluído)"),
+    MenuBanqueteria("☕",
+        "Menú Coffee Break",
+        "Perfecto para reuniones, capacitaciones y jornadas de trabajo.",
+        listOf("Café y té", "Jugos o agua", "Mini pastelería", "Opciones dulces y saladas"),
+        "$8.500 por persona (IVA incluído)")
 )
 
 private val terracota = Color(0xFFCB522E)
@@ -63,7 +84,7 @@ fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "Paolicias Banquetería",
+                text = "Paolicias.Sweet",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = terracota
@@ -95,10 +116,23 @@ fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = menu.precio,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color(0xFFCB522E)
+                                )
+                            }
                             Text("Este menú puede incluir:", fontWeight = FontWeight.SemiBold, color = Color(0xFF50372B))
                             menu.incluye.forEach { item ->
                                 Text("•  $item", fontSize = 14.sp, color = Color(0xFF50372B), modifier = Modifier.padding(top = 3.dp))
                             }
+
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
                                 onClick = {onNavigateToCotizar()},

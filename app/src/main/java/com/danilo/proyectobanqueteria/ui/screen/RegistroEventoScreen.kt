@@ -60,14 +60,16 @@ import java.util.Calendar
 @Composable
 fun RegistroEventoScreen(
     viewModel: EventoViewModel = viewModel(),
-    //onNavigateToResumen: () -> Unit,
+    onNavigateToResumen: () -> Unit,
     onNavigateToCatalogo: () -> Unit
 ){
     val context = LocalContext.current
     val state = viewModel.uiState
 
     var desplegar by remember { mutableStateOf(false) }
+    var desplegarH by remember { mutableStateOf(false) }
     val listarEventos = listOf("Cóctel","Celebración","Matrimonio","Empresarial","Coffee Break","Otro")
+    val listarHorarios = listOf("Mañana (09.00 - 13.00)","Tarde (14.00 - 19.00)","Noche (20.00 - 02.00")
 
     val seleccionarFecha = remember { val calendario = Calendar.getInstance()
         val anio = calendario.get(Calendar.YEAR)
@@ -114,7 +116,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,7 +136,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -155,7 +157,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -175,7 +177,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -194,7 +196,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -223,7 +225,7 @@ fun RegistroEventoScreen(
                             focusedContainerColor = Color(0xFFE2E2E2),
                             unfocusedContainerColor = Color(0xFFE2E2E2),
                             focusedBorderColor = Color(0xFFF57E41),
-                            unfocusedBorderColor = Color(0xFFF57E41)
+                            unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -273,12 +275,61 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {seleccionarFecha.show()}
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Horario",
+                    fontWeight = FontWeight.Bold
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ){
+                    OutlinedTextField(
+                        value = state.horario,
+                        onValueChange = {},
+                        singleLine = true,
+                        readOnly = true,
+                        trailingIcon = { Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Seleccionar horarios",
+                            tint = Color(0xFFF57E41)
+                        ) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFE2E2E2),
+                            unfocusedContainerColor = Color(0xFFE2E2E2),
+                            focusedBorderColor = Color(0xFFF57E41),
+                            unfocusedBorderColor = Color(0xFF888888)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clickable{desplegarH = true}
+                    )
+                    DropdownMenu(
+                        expanded = desplegarH,
+                        onDismissRequest = {desplegarH = false}
+                    ) {
+                        listarHorarios.forEach { opcion ->
+                            DropdownMenuItem(
+                                text = {Text(opcion)},
+                                onClick = {
+                                    viewModel.onHorarioChanged(opcion)
+                                    desplegarH = false
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "Cantidad de asistentes",
@@ -295,7 +346,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41),
+                        unfocusedBorderColor = Color(0xFF888888),
                         errorBorderColor = Color(0xFFB00020),
                         errorContainerColor = Color(0xFFFCE8E6)
                     ),
@@ -331,7 +382,7 @@ fun RegistroEventoScreen(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
                         focusedBorderColor = Color(0xFFF57E41),
-                        unfocusedBorderColor = Color(0xFFF57E41)
+                        unfocusedBorderColor = Color(0xFF888888)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -342,7 +393,7 @@ fun RegistroEventoScreen(
                         viewModel.onConfirmarClick(
                             context = context,
                             onSuccess = {Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
-                                //onNavigateToResumen()
+                                onNavigateToResumen()
                             }
                         )
                     },
@@ -396,7 +447,7 @@ fun RegistroEventoScreen(
 @Composable
 fun RegistroEventoScreenPreview(){
     RegistroEventoScreen(
-        //onNavigateToResumen = {},
+        onNavigateToResumen = {},
         onNavigateToCatalogo = {}
     )
 }

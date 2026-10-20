@@ -47,6 +47,9 @@ class EventoViewModel: ViewModel() {
         uiState = uiState.copy(fecha = fecha)
         errorMensaje = null
     }
+    fun onHorarioChanged(horario: String){
+        uiState = uiState.copy(horario = horario)
+    }
     fun onAsistentes(asistentes: String){
         val canti = asistentes.toIntOrNull()?:0
         uiState = uiState.copy(asistentes = canti)
@@ -81,6 +84,10 @@ class EventoViewModel: ViewModel() {
                 errorMensaje = "Por favor, selecciona una fecha"
                 return
             }
+            state.horario.isBlank()->{
+                errorMensaje = "Por favor, selecciona un horario"
+                return
+            }
             state.asistentes !in 20..100->{
                 errorAsistentes = true
                 errorMensaje = "Cantidad de asistentes debe ser entre 20 y 100"
@@ -107,6 +114,7 @@ class EventoViewModel: ViewModel() {
                     email = state.email,
                     tipoEvento = state.tipoEvento,
                     fecha = state.fecha,
+                    horario = state.horario,
                     asistentes = state.asistentes,
                     observaciones = state.observaciones
                 )
