@@ -60,7 +60,8 @@ import java.util.Calendar
 @Composable
 fun RegistroEventoScreen(
     viewModel: EventoViewModel = viewModel(),
-    onNavigateToResumen: ()-> Unit
+    //onNavigateToResumen: () -> Unit,
+    onNavigateToCatalogo: () -> Unit
 ){
     val context = LocalContext.current
     val state = viewModel.uiState
@@ -339,10 +340,9 @@ fun RegistroEventoScreen(
                 Button(
                     onClick = {
                         viewModel.onConfirmarClick(
+                            context = context,
                             onSuccess = {Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
-                                onNavigateToResumen()},
-                            onError = {mensajeError ->
-                                Toast.makeText(context,mensajeError, Toast.LENGTH_SHORT).show()
+                                //onNavigateToResumen()
                             }
                         )
                     },
@@ -376,28 +376,14 @@ fun RegistroEventoScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 Button(
-                    onClick = {},
+                    onClick = {onNavigateToCatalogo()},
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57E41)),
                     shape = RoundedCornerShape(50),
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                 ) {
-                    Text(text = "Inicio",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp)
-                }
-
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57E41)),
-                    shape = RoundedCornerShape(50),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Text(text = "Catálogo",
+                    Text(text = "Ir a catálogo",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp)
@@ -409,5 +395,8 @@ fun RegistroEventoScreen(
 @Preview(showBackground = true)
 @Composable
 fun RegistroEventoScreenPreview(){
-    RegistroEventoScreen{}
+    RegistroEventoScreen(
+        //onNavigateToResumen = {},
+        onNavigateToCatalogo = {}
+    )
 }

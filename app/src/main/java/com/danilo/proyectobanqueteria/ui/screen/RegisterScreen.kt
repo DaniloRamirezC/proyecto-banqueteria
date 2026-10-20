@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -110,7 +111,7 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    viewModel.onRegisterClick{
+                    viewModel.onRegisterClick(context){
                         Toast.makeText(
                             context,
                             "¡Registro exitoso! Por favor inicia sesión",
@@ -119,7 +120,11 @@ fun RegisterScreen(
                         onNavigateToLogin()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFCB522E),
+                    contentColor = Color.White
+                )
             ) {
                 Text( text = "Registrarse")
             }

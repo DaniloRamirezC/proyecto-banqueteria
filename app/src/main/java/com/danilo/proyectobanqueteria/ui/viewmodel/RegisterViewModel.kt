@@ -1,11 +1,16 @@
 package com.danilo.proyectobanqueteria.ui.viewModel
 
 import android.util.Log
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.danilo.proyectobanqueteria.model.RegisterModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
+import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
+import kotlinx.coroutines.launch
 
 class RegisterViewModel: ViewModel(){
 
@@ -28,7 +33,7 @@ class RegisterViewModel: ViewModel(){
         uiState = uiState.copy(confirmPassword=confirmPassword, errorMessage = null)
     }
 
-    fun onRegisterClick(onSuccess:() -> Unit){
+    fun onRegisterClick(context: Context, onSuccess:() -> Unit){
         val state = uiState
 
         if(state.name.isBlank() || state.email.isBlank() || state.password.isBlank()){
@@ -41,9 +46,22 @@ class RegisterViewModel: ViewModel(){
             return
         }
 
-        Log.d("RegisterVM", "Usuario registrado: ${state.name} (${state.email})")
-        uiState = uiState.copy(errorMessage = null)
-        onSuccess()
+        viewModelScope.launch {
+            val db = UserDatabase.getDatabase(context)
+            val existingUser = db.UsuarioDao().getUserByEmail(state.email)
 
+            if(existingUser!=null){
+                uiState = uiState.copy(errorMessage = "El correo ya está registrado")
+            }else{
+                val nuevoUser = UsuarioEntity(
+                    nombre = state.name,
+                    email = state.email,
+                    contrasena = state.password
+                )
+                db.UsuarioDao().registerUser(nuevoUser)
+                uiState = uiState.copy(errorMessage = null)
+                onSuccess()
+            }
+        }
     }
 }

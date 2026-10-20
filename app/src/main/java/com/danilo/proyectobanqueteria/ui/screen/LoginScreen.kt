@@ -1,5 +1,6 @@
 package com.danilo.proyectobanqueteria.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -16,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,9 +32,12 @@ import com.danilo.proyectobanqueteria.ui.viewModel.LoginViewModel
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
+    onLoginSuccess: () -> Unit,
     viewModel: LoginViewModel = viewModel()
 ) {
     val state = viewModel.uiState
+    val context = LocalContext.current
+
     Scaffold(
         topBar = { Header("Iniciar sesión") },
         bottomBar = { Footer() }
@@ -68,11 +75,29 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (viewModel.errorMessage!=null){
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = viewModel.errorMessage!!,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {viewModel.onLoginClick()},
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    viewModel.onLoginClick(context) {
+                        Toast.makeText(context,"Bienvenido de nuevo", Toast.LENGTH_SHORT).show()
+                        onLoginSuccess()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFCB522E),
+                    contentColor = Color.White
+                )
             ) {
                 Text("Ingresar")
             }
@@ -81,7 +106,11 @@ fun LoginScreen(
 
             Button(
                 onClick = {onNavigateToRegister()},
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFCB522E),
+                    contentColor = Color.White
+                )
             ) {
                 Text("Ir a Registro")
             }
@@ -91,6 +120,8 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen({})
+    LoginScreen(
+        onNavigateToRegister = {},
+        onLoginSuccess = {})
 }
 

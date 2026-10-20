@@ -98,5 +98,7 @@ fun BanqueteriaScreen(
 @Preview(showBackground = true)
 @Composable
 fun BanqueteriaScreenPreview(){
-    BanqueteriaScreen{}
+    BanqueteriaScreen(
+        onNavigateToRegister = {}
+    )
 }

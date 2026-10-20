@@ -14,6 +14,7 @@ import com.danilo.proyectobanqueteria.ui.screen.BanqueteriaScreen
 import com.danilo.proyectobanqueteria.ui.screen.CatalogoScreen
 import com.danilo.proyectobanqueteria.ui.screen.LoginScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
+import com.danilo.proyectobanqueteria.ui.screen.RegistroEventoScreen
 
 object Routes{
     const val BANQUETER = "Banqueteria"
@@ -21,6 +22,7 @@ object Routes{
     const val LOGIN = "Login"
     const val CATALOG = "Catálogo"
     const val REGISTER_EVENT = "Registro evento"
+    const val RESUME = "Resumen evento"
 }
 
 @Composable
@@ -62,7 +64,7 @@ fun BanqueteriaNavigation(){
             BanqueteriaScreen(
                 onNavigateToRegister = {
                     navController.navigate(Routes.REGISTER_USER){
-                        popUpTo(Routes.REGISTER_USER) {inclusive = true}
+                        popUpTo(Routes.BANQUETER) {inclusive = true}
                     }
                 }
             )
@@ -79,6 +81,11 @@ fun BanqueteriaNavigation(){
             LoginScreen(
                 onNavigateToRegister = {
                     navController.navigate(Routes.REGISTER_USER)
+                },
+                onLoginSuccess = {
+                    navController.navigate(Routes.CATALOG){
+                        popUpTo(Routes.LOGIN) {inclusive = true}
+                    }
                 }
             )
 
@@ -91,7 +98,14 @@ fun BanqueteriaNavigation(){
             )
         }
         composable(Routes.REGISTER_EVENT){
-
+            RegistroEventoScreen(
+                /*onNavigateToResumen = {
+                    navController.navigate(Routes.RESUME)
+                },*/
+                onNavigateToCatalogo = {
+                    navController.navigate(Routes.CATALOG)
+                }
+            )
         }
     }
 }
