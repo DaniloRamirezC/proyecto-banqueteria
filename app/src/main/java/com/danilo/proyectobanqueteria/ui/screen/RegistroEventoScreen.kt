@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
+import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import com.danilo.proyectobanqueteria.ui.viewModel.EventoViewModel
 import java.util.Calendar
 
@@ -100,8 +102,9 @@ fun RegistroEventoScreen(
                 horizontalAlignment =Alignment.Start,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp,16.dp)
                     .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+                    .imePadding()
             ){
                 Text(
                     text = "Nombre",
@@ -392,10 +395,15 @@ fun RegistroEventoScreen(
                     onClick = {
                         viewModel.onConfirmarClick(
                             context = context,
-                            onSuccess = {Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
+                            onSuccess = {
+                                vibracion(context)
+                                Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
                                 onNavigateToResumen()
                             }
                         )
+                        viewModel.errorMensaje?.let { mensaje ->
+                            Toast.makeText(context,mensaje, Toast.LENGTH_SHORT).show()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
@@ -424,14 +432,15 @@ fun RegistroEventoScreen(
                     .align(Alignment.BottomCenter)
                     .background(Color(0xFFE6C196))
                     .padding(horizontal = 24.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.Center
             ){
                 Button(
                     onClick = {onNavigateToCatalogo()},
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57E41)),
                     shape = RoundedCornerShape(50),
                     modifier = Modifier
-                        .weight(1f)
+                        .fillMaxWidth(1f)
+                        .shadow(5.dp, shape = CircleShape)
                         .height(48.dp)
                 ) {
                     Text(text = "Ir a catálogo",
