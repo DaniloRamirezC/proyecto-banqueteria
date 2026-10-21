@@ -1,6 +1,7 @@
 package com.danilo.proyectobanqueteria.ui.viewModel
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,7 +16,7 @@ import kotlin.String
 class EventoViewModel: ViewModel() {
 
     var uiState by mutableStateOf(EventoModel())
-        private set
+
     var errorMensaje by mutableStateOf<String?>(null)
         private set
     var errorAsistentes by mutableStateOf(false)
@@ -60,6 +61,17 @@ class EventoViewModel: ViewModel() {
     }
     fun onObservacionesChanged(observaciones: String){
         uiState = uiState.copy(observaciones = observaciones)
+    }
+    fun onComprobanteSelec(uri: Uri?){
+        if(uri!=null){
+            val fechaActual = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
+                java.util.Locale.getDefault()).format(java.util.Date())
+            uiState = uiState.copy(
+                comprobante = uri,
+                estadoAbono = "Pagado en 50%",
+                fechaPago = fechaActual
+            )
+        }
     }
     fun onConfirmarClick(context: Context, onSuccess: ()-> Unit){
         val state = uiState
@@ -122,7 +134,6 @@ class EventoViewModel: ViewModel() {
                 errorMensaje = null
                 onSuccess()
             }
-
         }
     }
 }

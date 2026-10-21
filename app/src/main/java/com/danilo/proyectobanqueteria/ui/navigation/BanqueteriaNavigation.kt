@@ -7,14 +7,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.danilo.proyectobanqueteria.model.EventoModel
 import com.danilo.proyectobanqueteria.ui.screen.BanqueteriaScreen
 import com.danilo.proyectobanqueteria.ui.screen.CatalogoScreen
 import com.danilo.proyectobanqueteria.ui.screen.LoginScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegistroEventoScreen
+import com.danilo.proyectobanqueteria.ui.screen.ResumenEventoScreen
+import com.danilo.proyectobanqueteria.ui.viewModel.EventoViewModel
 
 object Routes{
     const val BANQUETER = "Banqueteria"
@@ -28,6 +33,7 @@ object Routes{
 @Composable
 fun BanqueteriaNavigation(){
     val navController = rememberNavController()
+    val eventoViewModel: EventoViewModel = viewModel()
     NavHost(
         navController = navController,
         startDestination = Routes.BANQUETER,
@@ -99,11 +105,23 @@ fun BanqueteriaNavigation(){
         }
         composable(Routes.REGISTER_EVENT){
             RegistroEventoScreen(
+                viewModel = eventoViewModel,
                 onNavigateToResumen = {
                     navController.navigate(Routes.RESUME)
                 },
                 onNavigateToCatalogo = {
                     navController.navigate(Routes.CATALOG)
+                }
+            )
+        }
+        composable(Routes.RESUME){
+            ResumenEventoScreen(
+                viewModel = eventoViewModel,
+                onNavigateToCatalogo = {
+                    eventoViewModel.uiState = EventoModel()
+                    navController.navigate(Routes.CATALOG){
+                        popUpTo(Routes.BANQUETER){inclusive = true}
+                    }
                 }
             )
         }
