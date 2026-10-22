@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.danilo.proyectobanqueteria.data.local.entity.EventoEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.EventDatabase
 import com.danilo.proyectobanqueteria.model.EventoModel
+import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
 import kotlin.String
 
@@ -78,31 +79,38 @@ class EventoViewModel: ViewModel() {
         when{
             state.nombre.isBlank() -> {
                 errorMensaje = "Por favor, ingresa el nombre"
+                vibracion(context)
                 return
             }
             state.rut.isBlank() ->{
                 errorMensaje = "Por favor, ingresa el Rut"
+                vibracion(context)
                 return
             }
             state.tipoEvento.isBlank() ->{
                 errorMensaje = "Por favor, selecciona el tipo de evento"
+                vibracion(context)
                 return
             }
             state.telefono.isBlank() ->{
                 errorMensaje = "Por favor, ingrese su teléfono"
+                vibracion(context)
                 return
             }
             state.fecha.isBlank() ->{
                 errorMensaje = "Por favor, selecciona una fecha"
+                vibracion(context)
                 return
             }
             state.horario.isBlank()->{
                 errorMensaje = "Por favor, selecciona un horario"
+                vibracion(context)
                 return
             }
             state.asistentes !in 20..100->{
                 errorAsistentes = true
                 errorMensaje = "Cantidad de asistentes debe ser entre 20 y 100"
+                vibracion(context)
                 return
             }else ->{
                 errorAsistentes = false
@@ -117,6 +125,7 @@ class EventoViewModel: ViewModel() {
 
             if(rutExistente!=null){
                 errorMensaje = "Este Rut ya existe"
+                vibracion(context)
             }else{
                 val nuevoEvent = EventoEntity(
                     nombre = state.nombre,

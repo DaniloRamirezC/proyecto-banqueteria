@@ -71,7 +71,7 @@ fun RegistroEventoScreen(
     var desplegar by remember { mutableStateOf(false) }
     var desplegarH by remember { mutableStateOf(false) }
     val listarEventos = listOf("Cóctel","Celebración","Matrimonio","Empresarial","Coffee Break","Otro")
-    val listarHorarios = listOf("Mañana (09.00 - 13.00)","Tarde (14.00 - 19.00)","Noche (20.00 - 02.00")
+    val listarHorarios = listOf("Mañana (09.00 - 13.00)","Tarde (14.00 - 19.00)","Noche (20.00 - 02.00)")
 
     val seleccionarFecha = remember { val calendario = Calendar.getInstance()
         val anio = calendario.get(Calendar.YEAR)
@@ -381,6 +381,8 @@ fun RegistroEventoScreen(
                     value = state.observaciones,
                     onValueChange = {viewModel.onObservacionesChanged(it)},
                     shape = RoundedCornerShape(12.dp),
+                    minLines = 4,
+                    maxLines = 6,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFFE2E2E2),
                         unfocusedContainerColor = Color(0xFFE2E2E2),
@@ -389,6 +391,7 @@ fun RegistroEventoScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(120.dp)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
@@ -396,7 +399,6 @@ fun RegistroEventoScreen(
                         viewModel.onConfirmarClick(
                             context = context,
                             onSuccess = {
-                                vibracion(context)
                                 Toast.makeText(context,"Evento ingresado con éxito",Toast.LENGTH_SHORT).show()
                                 onNavigateToResumen()
                             }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
+import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel(){
@@ -31,6 +32,7 @@ class LoginViewModel : ViewModel(){
 
         if(email.isBlank() || password.isBlank()){
             errorMessage = "Ingresa correo y contraseña"
+            vibracion(context)
             return
         }
         viewModelScope.launch{
@@ -42,6 +44,7 @@ class LoginViewModel : ViewModel(){
                 onSuccess()
             }else{
                 errorMessage = "Correo o contraseña incorrectos"
+                vibracion(context)
             }
         }
     }

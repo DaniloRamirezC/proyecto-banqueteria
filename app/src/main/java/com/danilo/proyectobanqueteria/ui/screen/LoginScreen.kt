@@ -15,13 +15,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,7 +42,7 @@ fun LoginScreen(
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { Header("Iniciar sesión") },
+        topBar = { Header("Paolicias.Sweet") },
         bottomBar = { Footer() }
     ) { innerPadding ->
         Column(
@@ -50,7 +53,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("Login", style = MaterialTheme.typography.headlineMedium)
+            Text("Inicia sesión en Paolicias.Sweet", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -104,15 +107,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {onNavigateToRegister()},
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFCB522E),
-                    contentColor = Color.White
-                )
+            TextButton(
+                onClick = {onNavigateToRegister()}
             ) {
-                Text("¿No tienes cuenta? Regístrate")
+                Text("¿No tienes cuenta? Regístrate",
+                textDecoration = TextDecoration.Underline,
+                color = Color(0xFFCB522E))
             }
         }
     }

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +43,7 @@ fun RegisterScreen(
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { Header("Registro de usuario") },
+        topBar = { Header("Paolicias.Sweet") },
         bottomBar = { Footer() }
 
     ) {innerPadding ->
@@ -56,7 +57,7 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("Registro", style = MaterialTheme.typography.headlineMedium)
+            Text("Regístrate", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
 
             Spacer(modifier = Modifier.height(16.dp))
 

@@ -2,8 +2,11 @@ package com.danilo.proyectobanqueteria.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,8 +25,10 @@ fun Footer(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .background(backgroundColor),
+            .background(backgroundColor)
+            .navigationBarsPadding()
+            .defaultMinSize(minHeight = 44.dp)
+            .padding(8.dp,12.dp),
         contentAlignment = Alignment.Center
     ){
         Text(

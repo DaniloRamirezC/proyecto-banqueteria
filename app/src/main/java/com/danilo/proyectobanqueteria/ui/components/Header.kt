@@ -2,8 +2,12 @@ package com.danilo.proyectobanqueteria.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,8 +26,10 @@ fun Header(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-            .background(backgroundColor),
+            .background(backgroundColor)
+            .statusBarsPadding()
+            .defaultMinSize(minHeight = 56.dp)
+            .padding(12.dp,16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
