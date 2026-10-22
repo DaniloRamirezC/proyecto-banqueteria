@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
+import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
 
 class RegisterViewModel: ViewModel(){
@@ -38,11 +39,13 @@ class RegisterViewModel: ViewModel(){
 
         if(state.name.isBlank() || state.email.isBlank() || state.password.isBlank()){
             uiState = uiState.copy(errorMessage = "Por favor completa todos los campos")
+            vibracion(context)
             return
         }
 
         if(state.password != state.confirmPassword){
             uiState = uiState.copy(errorMessage = "Las contraseñas no coinciden")
+            vibracion(context)
             return
         }
 
@@ -52,6 +55,7 @@ class RegisterViewModel: ViewModel(){
 
             if(existingUser!=null){
                 uiState = uiState.copy(errorMessage = "El correo ya está registrado")
+                vibracion(context)
             }else{
                 val nuevoUser = UsuarioEntity(
                     nombre = state.name,
