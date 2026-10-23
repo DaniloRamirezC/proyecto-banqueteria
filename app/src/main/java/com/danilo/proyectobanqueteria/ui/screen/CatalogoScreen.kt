@@ -1,5 +1,6 @@
 package com.danilo.proyectobanqueteria.ui.screen
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,7 +40,7 @@ import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
 
 private data class MenuBanqueteria(
-    val emoji: String,
+    @DrawableRes val imagen: Int,
     val nombre: String,
     val descripcion: String,
     val incluye: List<String>,
@@ -47,27 +48,27 @@ private data class MenuBanqueteria(
 )
 
 private val menus = listOf(
-    MenuBanqueteria("🥂",
+    MenuBanqueteria(R.drawable.menu_coctel,
         "Menú Cóctel",
         "Ideal para recepciones, inauguraciones y celebraciones de pie.",
         listOf("Canapés variados", "Mini sándwiches", "Empanaditas de cóctel", "Bocaditos dulces y bebidas a definir"),
         "$14.000 por persona (IVA incluído)"),
-    MenuBanqueteria("🎉",
+    MenuBanqueteria(R.drawable.menu_celebracion,
         "Menú Celebración",
         "Una alternativa para cumpleaños, aniversarios y reuniones familiares.",
         listOf("Cóctel de bienvenida", "Plato principal con acompañamiento", "Ensaladas surtidas", "Postre individual"),
         "$20.000 por persona (IVA incluído)"),
-    MenuBanqueteria("💍",
+    MenuBanqueteria(R.drawable.menu_matrimonio,
         "Menú Matrimonio",
         "Una propuesta especial para compartir un día inolvidable.",
         listOf("Recepción de invitados", "Entrada o cóctel", "Plato principal a elección", "Mesa dulce y servicio de bebidas a cotizar"),
         "$35.000 por persona (IVA incluído)"),
-    MenuBanqueteria("🍽️",
+    MenuBanqueteria(R.drawable.menu_empresarial,
         "Menú Empresarial",
         "Pensado para almuerzos corporativos, cenas y eventos de empresa.",
         listOf("Entrada o ensalada", "Plato principal", "Postre", "Opciones de café y bebidas"),
         "$18.500 por persona (IVA incluído)"),
-    MenuBanqueteria("☕",
+    MenuBanqueteria(R.drawable.menu_coffe_break,
         "Menú Coffee Break",
         "Perfecto para reuniones, capacitaciones y jornadas de trabajo.",
         listOf("Café y té", "Jugos o agua", "Mini pastelería", "Opciones dulces y saladas"),
@@ -123,7 +124,15 @@ fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = menu.emoji, fontSize = 30.sp)
+                                Image(
+                                    painter = painterResource(id = menu.imagen),
+                                    contentDescription = menu.nombre,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(90.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                )
+
                                 Column(modifier = Modifier.padding(start = 10.dp)) {
                                     Text(menu.nombre, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = terracota)
                                     Text(menu.descripcion, fontSize = 13.sp, color = Color(0xFF50372B))
