@@ -40,7 +40,7 @@ import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
 
 private data class MenuBanqueteria(
-    @DrawableRes val imagen: Int,
+    @DrawableRes val imagen: Int    ,
     val nombre: String,
     val descripcion: String,
     val incluye: List<String>,
