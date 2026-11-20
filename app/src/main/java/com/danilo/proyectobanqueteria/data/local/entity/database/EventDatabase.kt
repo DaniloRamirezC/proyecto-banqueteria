@@ -8,7 +8,7 @@ import com.danilo.proyectobanqueteria.data.local.entity.EventoEntity
 import com.danilo.proyectobanqueteria.data.local.entity.dao.EventoDao
 import kotlin.concurrent.Volatile
 
-@Database(entities = [EventoEntity::class], version = 2, exportSchema = false)
+@Database(entities = [EventoEntity::class], version = 3, exportSchema = false)
 abstract class EventDatabase: RoomDatabase() {
 
     abstract fun EventoDao(): EventoDao

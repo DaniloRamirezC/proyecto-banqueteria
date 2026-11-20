@@ -70,7 +70,7 @@ fun ResumenEventoScreen(
         contract = ActivityResultContracts.TakePicture()
     ){ exitoso: Boolean ->
         if (exitoso && fotoReg !=null){
-            viewModel.onComprobanteSelec(fotoReg)
+            viewModel.onComprobanteSelec(context,fotoReg)
             vibracion(context)
         }
     }

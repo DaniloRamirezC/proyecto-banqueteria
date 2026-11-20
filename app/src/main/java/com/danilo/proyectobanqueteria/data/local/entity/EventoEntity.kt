@@ -18,5 +18,10 @@ data class EventoEntity(
     val fecha: String,
     val horario: String,
     val asistentes: Int,
-    val observaciones: String
+    val observaciones: String,
+
+    val comprobantePath: String = "",
+    val estadoAbono: String = "Pendiente",
+    val fechaPago: String = "",
+    val estadoRevision: String = "Pendiente"
 )

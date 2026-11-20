@@ -74,15 +74,32 @@ class EventoViewModel: ViewModel() {
     fun onObservacionesChanged(observaciones: String){
         uiState = uiState.copy(observaciones = observaciones)
     }
-    fun onComprobanteSelec(uri: Uri?){
+    fun onComprobanteSelec(context: Context,uri: Uri?){
         if(uri!=null){
             val fechaActual = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
                 java.util.Locale.getDefault()).format(java.util.Date())
+
+            val nuevoEstadoAbono = if (uiState.esPasteleria) "Completado" else "Pagado en 50%"
+
             uiState = uiState.copy(
                 comprobante = uri,
-                estadoAbono = if (uiState.esPasteleria) "Completado" else "Pagado en 50%",
+                estadoAbono = nuevoEstadoAbono,
                 fechaPago = fechaActual
             )
+
+            viewModelScope.launch {
+                val rutaGuardada = com.danilo.proyectobanqueteria.ui.natives.guardarComprobante(context,uri) ?: ""
+
+                if(rutaGuardada.isNotEmpty()){
+                    val db = EventDatabase.getEventDatabase(context)
+                    db.EventoDao().actualizarComprobantePorRut(
+                        rut = uiState.rut,
+                        path = rutaGuardada,
+                        estadoAbono =nuevoEstadoAbono,
+                        fechaPago = fechaActual
+                    )
+                }
+            }
         }
     }
     fun onConfirmarClick(context: Context, onSuccess: ()-> Unit){
@@ -154,7 +171,11 @@ class EventoViewModel: ViewModel() {
                     fecha = state.fecha,
                     horario = state.horario,
                     asistentes = state.asistentes,
-                    observaciones = state.observaciones
+                    observaciones = state.observaciones,
+                    comprobantePath = "",
+                    estadoAbono = state.estadoAbono,
+                    fechaPago = state.fechaPago,
+                    estadoRevision = "Pendiente"
                 )
                 db.EventoDao().registerEvent(nuevoEvent)
                 errorMensaje = null
