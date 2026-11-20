@@ -42,7 +42,18 @@ class EventoViewModel: ViewModel() {
         errorMensaje = null
     }
     fun onTipoEventoChanged(tipoEvento: String){
-        uiState = uiState.copy(tipoEvento = tipoEvento)
+        val esPasteleria = tipoEvento == "Pastelería"
+        uiState = uiState.copy(
+            tipoEvento = tipoEvento,
+            pastel = if(esPasteleria) uiState.pastel else "",
+            asistentes = if(esPasteleria) 0 else uiState.asistentes,
+            horario = if(esPasteleria && uiState.horario.startsWith("Noche")) "" else uiState.horario
+        )
+        errorAsistentes = false
+        errorMensaje = null
+    }
+    fun onPastelChanged(pastel: String){
+        uiState = uiState.copy(pastel = pastel)
         errorMensaje = null
     }
     fun onfechaChanged(fecha: String){
@@ -69,7 +80,7 @@ class EventoViewModel: ViewModel() {
                 java.util.Locale.getDefault()).format(java.util.Date())
             uiState = uiState.copy(
                 comprobante = uri,
-                estadoAbono = "Pagado en 50%",
+                estadoAbono = if (uiState.esPasteleria) "Completado" else "Pagado en 50%",
                 fechaPago = fechaActual
             )
         }
@@ -92,6 +103,11 @@ class EventoViewModel: ViewModel() {
                 vibracion(context)
                 return
             }
+            state.esPasteleria && state.pastel.isBlank() ->{
+                errorMensaje = "Por favor, selecciona un pastel del catálogo"
+                vibracion(context)
+                return
+            }
             state.telefono.isBlank() ->{
                 errorMensaje = "Por favor, ingrese su teléfono"
                 vibracion(context)
@@ -107,9 +123,9 @@ class EventoViewModel: ViewModel() {
                 vibracion(context)
                 return
             }
-            state.asistentes !in 20..100->{
+            !state.esPasteleria &&(state.asistentes !in 10..100 || state.asistentes %10 !=0) ->{
                 errorAsistentes = true
-                errorMensaje = "Cantidad de asistentes debe ser entre 20 y 100"
+                errorMensaje = "Por favor, selecciona la cantidad de asistentes"
                 vibracion(context)
                 return
             }else ->{
@@ -134,6 +150,7 @@ class EventoViewModel: ViewModel() {
                     telefono = state.telefono,
                     email = state.email,
                     tipoEvento = state.tipoEvento,
+                    pastel = if(state.esPasteleria) state.pastel else "",
                     fecha = state.fecha,
                     horario = state.horario,
                     asistentes = state.asistentes,

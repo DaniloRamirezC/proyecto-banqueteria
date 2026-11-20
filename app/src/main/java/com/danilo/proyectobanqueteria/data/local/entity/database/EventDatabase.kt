@@ -8,7 +8,7 @@ import com.danilo.proyectobanqueteria.data.local.entity.EventoEntity
 import com.danilo.proyectobanqueteria.data.local.entity.dao.EventoDao
 import kotlin.concurrent.Volatile
 
-@Database(entities = [EventoEntity::class], version = 1, exportSchema = false)
+@Database(entities = [EventoEntity::class], version = 2, exportSchema = false)
 abstract class EventDatabase: RoomDatabase() {
 
     abstract fun EventoDao(): EventoDao
@@ -23,7 +23,9 @@ abstract class EventDatabase: RoomDatabase() {
                     context.applicationContext,
                     EventDatabase::class.java,
                     "event_database.db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(dropAllTables = true)
+                    .build()
                 INSTANCE = instance
                 instance
             }

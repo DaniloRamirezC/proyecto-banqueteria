@@ -3,7 +3,6 @@ package com.danilo.proyectobanqueteria.ui.screen
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -90,8 +89,17 @@ fun RegistroEventoScreen(
 
     var desplegar by remember { mutableStateOf(false) }
     var desplegarH by remember { mutableStateOf(false) }
-    val listarEventos = listOf("Cóctel","Celebración","Matrimonio","Empresarial","Coffee Break","Otro")
-    val listarHorarios = listOf("Mañana (09.00 - 13.00)","Tarde (14.00 - 19.00)","Noche (20.00 - 02.00)")
+    var desplegarAsistentes by remember { mutableStateOf(false) }
+    var desplegarPasteles by remember { mutableStateOf(false) }
+
+    val listarEventos = listOf("Cóctel","Celebración","Matrimonio","Empresarial","Coffee Break","Pastelería")
+    val listarHorarios = if(state.esPasteleria) {
+        listOf("Mañana (09.00 - 13.00)", "Tarde (14.00 - 19.00)")
+    }else{
+        listOf("Mañana (09.00 - 13.00)", "Tarde (14.00 - 19.00)", "Noche (20.00 - 02.00)")
+    }
+    val listarAsistentes = (10..100 step 10).toList()
+    val listarPasteles = listOf("")
 
     val moneda = remember { NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"))}
 
@@ -118,7 +126,7 @@ fun RegistroEventoScreen(
     )
 
     Scaffold(
-        topBar = { Header(title = "Registrar evento") },
+        topBar = { Header(title = if(state.esPasteleria) "Registrar pedido" else "Registrar evento") },
         bottomBar = { Footer() },
         containerColor = fondo
     ) {
@@ -229,7 +237,7 @@ fun RegistroEventoScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "Detalles del evento",
+                        text = if (state.esPasteleria) "Detalles del pedido" else "Detalle del evento",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = terracota
@@ -274,11 +282,65 @@ fun RegistroEventoScreen(
                             }
                         }
                     }
+
+                    AnimatedVisibility(
+                        visible = state.esPasteleria,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth()){
+                            OutlinedTextField(
+                                value = state.pastel,
+                                onValueChange = {},
+                                label = {Text("Seleccionar pastel")},
+                                placeholder = {Text("Elige una opción", color = Color.Gray)},
+                                singleLine = true,
+                                readOnly = true,
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = "Seleccionar pastel",
+                                        tint = terracota
+                                    )
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = textFieldColors,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .clickable{desplegarPasteles = true}
+                            )
+                            DropdownMenu(
+                                expanded = desplegarPasteles,
+                                onDismissRequest = {desplegarPasteles = false},
+                                containerColor = crema
+                            ) {
+                                listarPasteles.forEach { pastel ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = pastel,
+                                                color = textoCafe,
+                                                fontWeight = if(state.pastel == pastel) FontWeight.Bold else FontWeight.Normal
+                                            )
+                                        },
+                                        onClick = {
+                                            viewModel.onPastelChanged(pastel)
+                                            desplegarPasteles = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Box(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             value = state.fecha,
                             onValueChange = {},
-                            label = { Text("Fecha del evento") },
+                            label = { Text(if (state.esPasteleria) "Fecha de retiro" else "Fecha del evento")},
                             placeholder = { Text("DD/MM/AAAA", color = Color.Gray) },
                             singleLine = true,
                             readOnly = true,
@@ -340,29 +402,63 @@ fun RegistroEventoScreen(
                             }
                         }
                     }
-                    OutlinedTextField(
-                        value = if (state.asistentes == 0) "" else state.asistentes.toString(),
-                        onValueChange = { viewModel.onAsistentes(it) },
-                        label = { Text("Cantidad de asistentes (20 a 100)") },
-                        placeholder = { Text("Ej: 80", color = Color.Gray) },
-                        singleLine = true,
-                        isError = viewModel.errorAsistentes,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = textFieldColors,
-                        modifier = Modifier.fillMaxWidth()
-                    )
                     AnimatedVisibility(
-                        visible = viewModel.errorAsistentes,
-                        enter = fadeIn(animationSpec = tween(300)) + expandVertically(),
-                        exit = fadeOut(animationSpec = tween(200)) + shrinkVertically()
-                    ) {
-                        Text(
-                            text = "Debe ingresar entre 20 y 100 asistentes",
-                            color = Color(0xFFB00020),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        visible = !state.esPasteleria,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    )
+                    {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = if (state.asistentes == 0) "" else "${state.asistentes} personas",
+                                onValueChange = { viewModel.onAsistentes(it) },
+                                label = { Text("Cantidad de asistentes") },
+                                placeholder = {
+                                    Text(
+                                        "Seleccione cantidad (10 a 100)",
+                                        color = Color.Gray
+                                    )
+                                },
+                                singleLine = true,
+                                isError = viewModel.errorAsistentes,
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = "Seleccionar cantidad de asistentes",
+                                        tint = terracota
+                                    )
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = textFieldColors,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .clickable { desplegarAsistentes = true }
+                            )
+                            DropdownMenu(
+                                expanded = desplegarAsistentes,
+                                onDismissRequest = { desplegarAsistentes = false },
+                                containerColor = crema
+                            ) {
+                                listarAsistentes.forEach { cantidad ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "$cantidad personas",
+                                                color = textoCafe,
+                                                fontWeight = if (state.asistentes == cantidad) FontWeight.Bold else FontWeight.Normal
+                                            )
+                                        },
+                                        onClick = {
+                                            viewModel.onAsistentes(cantidad.toString())
+                                            desplegarAsistentes = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     OutlinedTextField(
@@ -404,7 +500,7 @@ fun RegistroEventoScreen(
                         ) {
                             Text("Valor por persona:", fontSize = 14.sp, color = textoCafe)
                             Text(
-                                "$${moneda.format(state.precioPersona)}",
+                                "${moneda.format(state.precioPersona)}",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = textoCafe
@@ -421,7 +517,7 @@ fun RegistroEventoScreen(
                                 color = textoCafe
                             )
                             Text(
-                                "$${moneda.format(state.totalEvento)}",
+                                "${moneda.format(state.totalEvento)}",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = terracota
@@ -434,7 +530,7 @@ fun RegistroEventoScreen(
                         ) {
                             Text("Abono inicial (50%):", fontSize = 14.sp, color = textoCafe)
                             Text(
-                                "$${moneda.format(state.totalEvento)}",
+                                "${moneda.format(state.abonoEvento)}",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = textoCafe
@@ -470,7 +566,7 @@ fun RegistroEventoScreen(
                 )
             ) {
                 Text(
-                    text = "Confirmar evento",
+                    text = if(state.esPasteleria) "Confirmar pedido" else "Confirmar evento",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

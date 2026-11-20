@@ -75,7 +75,7 @@ fun ResumenEventoScreen(
         }
     }
     Scaffold(
-        topBar = { Header(title = "Resumen de Cotización") },
+        topBar = { Header(title = if(evento.esPasteleria) "Resumen de pedido" else "Resumen de Cotización") },
         bottomBar = { Footer() }
     ) { innerPadding ->
         Column(
@@ -89,7 +89,7 @@ fun ResumenEventoScreen(
                 .imePadding()
         ) {
             Text(
-                text = "Registro de evento",
+                text = if(evento.esPasteleria) "Registro de pastelería" else "Registro de evento",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFCB522E)
@@ -109,31 +109,56 @@ fun ResumenEventoScreen(
                     DetalleEvento("Email: ", evento.email)
                     DetalleEvento("Empresa: ", evento.empresa)
                     DetalleEvento("Tipo de evento: ", evento.tipoEvento)
-                    DetalleEvento("Fecha: ", evento.fecha)
-                    DetalleEvento("Asistentes: ", "${evento.asistentes} personas")
-                    DetalleEvento("Observaciones: ", evento.observaciones)
+
+                    if(evento.esPasteleria && evento.pastel.isNotBlank()){
+                        DetalleEvento("Pastel elegido:",evento.pastel)
+                    }
+                    DetalleEvento(
+                        if(evento.esPasteleria) "Fecha de retiro: " else "Fecha: ", evento.fecha
+                    )
+                    DetalleEvento("Horario: ",evento.horario)
+
+                    if(!evento.esPasteleria){
+                        DetalleEvento("Asistentes: ","${evento.asistentes} personas")
+                    }
+
+                    DetalleEvento("Observaciones: ",evento.observaciones)
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                    DetalleEvento(
-                        "Precio por persona",
-                        moneda.format(evento.precioPersona)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = "Total estimado: ${moneda.format(evento.totalEvento)}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFFCB522E)
-                    )
-                    Text(
-                        text = "Abono (50%): ${moneda.format(evento.abonoEvento)}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF2E7D32)
-                    )
+                    if(evento.esPasteleria){
+                        if(evento.totalEvento>0){
+                            Text(
+                                text = "Total pedido: ${moneda.format(evento.totalEvento)}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFFCB522E)
+                            )
+                        }else{
+                            DetalleEvento("Valor total: ","Según tamaño de catálogo")
+                        }
+                    }else {
+                        DetalleEvento(
+                            "Precio por persona",
+                            moneda.format(evento.precioPersona)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Total estimado: ${moneda.format(evento.totalEvento)}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFFCB522E)
+                        )
+                        Text(
+                            text = "Abono (50%): ${moneda.format(evento.abonoEvento)}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF2E7D32)
+                        )
+                    }
                     Spacer(modifier = Modifier.height(6.dp))
-                    DetalleEvento("Estado abono: ", evento.estadoAbono)
+                    DetalleEvento(if(evento.esPasteleria) "Estado pago: " else "Estado abono: ", evento.estadoAbono)
                     if (evento.fechaPago.isNotBlank()) {
                         DetalleEvento("Fecha registro: ", evento.fechaPago)
                     }
@@ -206,20 +231,22 @@ fun ResumenEventoScreen(
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = { onNavigateToCatalogo() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57E41)),
-                shape = RoundedCornerShape(50),
+            OutlinedButton(
+                onClick = onNavigateToCatalogo,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .shadow(5.dp, shape = CircleShape)
-                    .height(48.dp)
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(24.dp),
+                border = BorderStroke(2.dp, Color(0xFFCB522E)),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color(0xFFFFF8EF),
+                    contentColor = Color(0xFFCB522E)
+                )
             ) {
                 Text(
-                    text = "Volver al catálogo",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    text = "Volver al Catálogo",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

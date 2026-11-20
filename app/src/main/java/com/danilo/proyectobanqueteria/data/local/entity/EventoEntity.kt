@@ -14,6 +14,7 @@ data class EventoEntity(
     val telefono: String,
     val email: String,
     val tipoEvento: String,
+    val pastel: String = "",
     val fecha: String,
     val horario: String,
     val asistentes: Int,
