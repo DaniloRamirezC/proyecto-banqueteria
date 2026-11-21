@@ -20,6 +20,7 @@ import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegistroEventoScreen
 import com.danilo.proyectobanqueteria.ui.screen.ResumenEventoScreen
 import com.danilo.proyectobanqueteria.ui.viewModel.EventoViewModel
+import com.danilo.proyectobanqueteria.ui.screen.AdminScreen
 
 object Routes{
     const val BANQUETER = "Banqueteria"
@@ -28,6 +29,7 @@ object Routes{
     const val CATALOG = "Catálogo"
     const val REGISTER_EVENT = "Registro evento"
     const val RESUME = "Resumen evento"
+    const val ADMIN = "Administrador"
 }
 
 @Composable
@@ -121,6 +123,22 @@ fun BanqueteriaNavigation(){
                     eventoViewModel.uiState = EventoModel()
                     navController.navigate(Routes.CATALOG){
                         popUpTo(Routes.BANQUETER){inclusive = true}
+                    }
+                }
+            )
+        }
+        composable(Routes.ADMIN) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            AdminScreen(
+                rutBusqueda = eventoViewModel.rutBusqueda,
+                reservas = eventoViewModel.listaReservas,
+                onRutChanged = { eventoViewModel.onRutBusquedaChanged(it) },
+                onBuscarPorRut = { eventoViewModel.buscarReservasPorRut(context) },
+                onLogout = {
+                    eventoViewModel.limpiarBusquedaAdmin()
+                    eventoViewModel.uiState = EventoModel()
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.ADMIN) { inclusive = true }
                     }
                 }
             )

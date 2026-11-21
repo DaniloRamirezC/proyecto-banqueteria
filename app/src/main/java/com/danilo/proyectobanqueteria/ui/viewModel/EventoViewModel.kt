@@ -12,9 +12,11 @@ import com.danilo.proyectobanqueteria.data.local.entity.database.EventDatabase
 import com.danilo.proyectobanqueteria.model.EventoModel
 import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
-import kotlin.String
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class EventoViewModel: ViewModel() {
+class EventoViewModel : ViewModel() {
 
     var uiState by mutableStateOf(EventoModel())
 
@@ -22,51 +24,67 @@ class EventoViewModel: ViewModel() {
         private set
     var errorAsistentes by mutableStateOf(false)
         private set
-    fun onNombreChanged(nombre: String){
+
+    var rutBusqueda by mutableStateOf("")
+        private set
+    var listaReservas by mutableStateOf<List<EventoModel>>(emptyList())
+        private set
+
+    fun onNombreChanged(nombre: String) {
         uiState = uiState.copy(nombre = nombre)
         errorMensaje = null
     }
-    fun onRutChanged(rut: String){
+
+    fun onRutChanged(rut: String) {
         uiState = uiState.copy(rut = rut)
         errorMensaje = null
     }
-    fun onEmpresaChanged(empresa: String){
+
+    fun onEmpresaChanged(empresa: String) {
         uiState = uiState.copy(empresa = empresa)
     }
-    fun onTelefonoChanged(telefono: String){
+
+    fun onTelefonoChanged(telefono: String) {
         uiState = uiState.copy(telefono = telefono)
         errorMensaje = null
     }
-    fun onEmailChanged(email: String){
+
+    fun onEmailChanged(email: String) {
         uiState = uiState.copy(email = email)
         errorMensaje = null
     }
-    fun onTipoEventoChanged(tipoEvento: String){
+
+    fun onTipoEventoChanged(tipoEvento: String) {
         uiState = uiState.copy(tipoEvento = tipoEvento)
         errorMensaje = null
     }
-    fun onfechaChanged(fecha: String){
+
+    fun onfechaChanged(fecha: String) {
         uiState = uiState.copy(fecha = fecha)
         errorMensaje = null
     }
-    fun onHorarioChanged(horario: String){
+
+    fun onHorarioChanged(horario: String) {
         uiState = uiState.copy(horario = horario)
     }
-    fun onAsistentes(asistentes: String){
-        val canti = asistentes.toIntOrNull()?:0
+
+    fun onAsistentes(asistentes: String) {
+        val canti = asistentes.toIntOrNull() ?: 0
         uiState = uiState.copy(asistentes = canti)
-        if (errorAsistentes){
+        if (errorAsistentes) {
             errorAsistentes = false
         }
         errorMensaje = null
     }
-    fun onObservacionesChanged(observaciones: String){
+
+    fun onObservacionesChanged(observaciones: String) {
         uiState = uiState.copy(observaciones = observaciones)
     }
-    fun onComprobanteSelec(uri: Uri?){
-        if(uri!=null){
-            val fechaActual = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
-                java.util.Locale.getDefault()).format(java.util.Date())
+
+    fun onComprobanteSelec(uri: Uri?) {
+        if (uri != null) {
+            val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                .format(Date())
             uiState = uiState.copy(
                 comprobante = uri,
                 estadoAbono = "Pagado en 50%",
@@ -74,59 +92,107 @@ class EventoViewModel: ViewModel() {
             )
         }
     }
-    fun onConfirmarClick(context: Context, onSuccess: ()-> Unit){
+
+    fun onRutBusquedaChanged(rut: String) {
+        rutBusqueda = rut
+        errorMensaje = null
+    }
+
+    fun buscarReservasPorRut(context: Context, rut: String = rutBusqueda) {
+        val rutLimpio = rut.trim()
+        if (rutLimpio.isBlank()) {
+            listaReservas = emptyList()
+            errorMensaje = "Por favor, ingresa un RUT"
+            return
+        }
+
+        viewModelScope.launch {
+            val db = EventDatabase.getEventDatabase(context)
+            val entidad: EventoEntity? = db.EventoDao().getEventByRut(rutLimpio)
+            if (entidad != null) {
+                errorMensaje = null
+                listaReservas = listOf(
+                    EventoModel(
+                        nombre = entidad.nombre,
+                        rut = entidad.rut,
+                        empresa = entidad.empresa,
+                        telefono = entidad.telefono,
+                        email = entidad.email,
+                        tipoEvento = entidad.tipoEvento,
+                        fecha = entidad.fecha,
+                        horario = entidad.horario,
+                        asistentes = entidad.asistentes,
+                        observaciones = entidad.observaciones
+                    )
+                )
+            } else {
+                listaReservas = emptyList()
+                errorMensaje = "No se encontró ninguna reserva con ese RUT"
+            }
+        }
+    }
+
+    fun limpiarBusquedaAdmin() {
+        rutBusqueda = ""
+        listaReservas = emptyList()
+        errorMensaje = null
+    }
+
+    fun onConfirmarClick(context: Context, onSuccess: () -> Unit) {
         val state = uiState
-        when{
+        when {
             state.nombre.isBlank() -> {
                 errorMensaje = "Por favor, ingresa el nombre"
                 vibracion(context)
                 return
             }
-            state.rut.isBlank() ->{
+            state.rut.isBlank() -> {
                 errorMensaje = "Por favor, ingresa el Rut"
                 vibracion(context)
                 return
             }
-            state.tipoEvento.isBlank() ->{
+            state.tipoEvento.isBlank() -> {
                 errorMensaje = "Por favor, selecciona el tipo de evento"
                 vibracion(context)
                 return
             }
-            state.telefono.isBlank() ->{
+            state.telefono.isBlank() -> {
                 errorMensaje = "Por favor, ingrese su teléfono"
                 vibracion(context)
                 return
             }
-            state.fecha.isBlank() ->{
+            state.fecha.isBlank() -> {
                 errorMensaje = "Por favor, selecciona una fecha"
                 vibracion(context)
                 return
             }
-            state.horario.isBlank()->{
+            state.horario.isBlank() -> {
                 errorMensaje = "Por favor, selecciona un horario"
                 vibracion(context)
                 return
             }
-            state.asistentes !in 20..100->{
+            state.asistentes !in 20..100 -> {
                 errorAsistentes = true
                 errorMensaje = "Cantidad de asistentes debe ser entre 20 y 100"
                 vibracion(context)
                 return
-            }else ->{
+            }
+            else -> {
                 errorAsistentes = false
-                if (state.empresa.isBlank()){
+                if (state.empresa.isBlank()) {
                     uiState = uiState.copy(empresa = "No aplica")
                 }
             }
         }
+
         viewModelScope.launch {
             val db = EventDatabase.getEventDatabase(context)
             val rutExistente = db.EventoDao().getEventByRut(state.rut)
 
-            if(rutExistente!=null){
+            if (rutExistente != null) {
                 errorMensaje = "Este Rut ya existe"
                 vibracion(context)
-            }else{
+            } else {
                 val nuevoEvent = EventoEntity(
                     nombre = state.nombre,
                     rut = state.rut,
