@@ -22,6 +22,11 @@ class EventoViewModel: ViewModel() {
         private set
     var errorAsistentes by mutableStateOf(false)
         private set
+    var rutBusqueda by mutableStateOf("")
+        private set
+    var listaReservas by mutableStateOf<List<EventoModel>>(emptyList())
+        private set
+
     fun onNombreChanged(nombre: String){
         uiState = uiState.copy(nombre = nombre)
         errorMensaje = null
@@ -182,5 +187,49 @@ class EventoViewModel: ViewModel() {
                 onSuccess()
             }
         }
+    }
+    fun onRutBusquedaChanged(rut: String) {
+        rutBusqueda = rut
+        errorMensaje = null
+    }
+
+    fun buscarReservasPorRut(context: Context, rut: String = rutBusqueda) {
+        val rutLimpio = rut.trim()
+        if (rutLimpio.isBlank()) {
+            listaReservas = emptyList()
+            errorMensaje = "Por favor, ingresa un RUT"
+            return
+        }
+
+        viewModelScope.launch {
+            val db = EventDatabase.getEventDatabase(context)
+            val entidad: EventoEntity? = db.EventoDao().getEventByRut(rutLimpio)
+            if (entidad != null) {
+                errorMensaje = null
+                listaReservas = listOf(
+                    EventoModel(
+                        nombre = entidad.nombre,
+                        rut = entidad.rut,
+                        empresa = entidad.empresa,
+                        telefono = entidad.telefono,
+                        email = entidad.email,
+                        tipoEvento = entidad.tipoEvento,
+                        fecha = entidad.fecha,
+                        horario = entidad.horario,
+                        asistentes = entidad.asistentes,
+                        observaciones = entidad.observaciones
+                    )
+                )
+            } else {
+                listaReservas = emptyList()
+                errorMensaje = "No se encontró ninguna reserva con ese RUT"
+            }
+        }
+    }
+
+    fun limpiarBusquedaAdmin() {
+        rutBusqueda = ""
+        listaReservas = emptyList()
+        errorMensaje = null
     }
 }
