@@ -10,5 +10,6 @@ data class UsuarioEntity(
     val id: Int = 0,
     val nombre: String,
     val email: String,
-    val contrasena: String
+    val contrasena: String,
+    val rol: String = "CLIENTE"
 )

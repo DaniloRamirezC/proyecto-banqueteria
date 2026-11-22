@@ -142,6 +142,12 @@ fun BanqueteriaNavigation(){
                 reservas = eventoViewModel.listaReservas,
                 onRutChanged = { eventoViewModel.onRutBusquedaChanged(it) },
                 onBuscarPorRut = { eventoViewModel.buscarReservasPorRut(context) },
+                onAprueboPago = { eventoId ->
+                    eventoViewModel.cambiarEstadoRevision(context,eventoId,"Aprobado")
+                },
+                onRechazoPago = { eventoId ->
+                    eventoViewModel.cambiarEstadoRevision(context,eventoId,"Rechazado")
+                },
                 onLogout = {
                     eventoViewModel.limpiarBusquedaAdmin()
                     eventoViewModel.uiState = EventoModel()

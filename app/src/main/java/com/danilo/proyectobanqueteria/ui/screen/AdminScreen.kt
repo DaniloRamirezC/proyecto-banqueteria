@@ -1,5 +1,7 @@
 package com.danilo.proyectobanqueteria.ui.screen
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,10 +32,14 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.danilo.proyectobanqueteria.model.EventoModel
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
+import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -50,6 +57,8 @@ fun AdminScreen(
     reservas: List<EventoModel>,
     onRutChanged: (String) -> Unit,
     onBuscarPorRut: () -> Unit,
+    onAprueboPago: (Int) -> Unit,
+    onRechazoPago: (Int) -> Unit,
     onLogout: () -> Unit
 ) {
     val moneda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"))
@@ -153,7 +162,7 @@ fun AdminScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Ingresa un RUT y presiona buscar para ver reservas.",
+                            text = "No hay reservas registradas para mostrar",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.Gray
@@ -216,6 +225,88 @@ fun AdminScreen(
                             if (evento.fechaPago.isNotBlank()) {
                                 DetalleEvento("Fecha registro: ", evento.fechaPago)
                             }
+                            DetalleEvento("Estado revisión: ", evento.estadoRevision)
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+                            val estimacion = evento.estimacionOperativa
+                            Text(
+                                text = "Estimación Operativa",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFCB522E)
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            DetalleEvento("Tramo: ", estimacion.tramo)
+                            DetalleEvento("Garzones requeridos: ", "${estimacion.garzon}")
+                            DetalleEvento("Ayudantes de cocina: ", "${estimacion.ayudanteCocina}")
+                            DetalleEvento("Total staff: ", "${estimacion.totalEquipo} personas")
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Insumos: ${estimacion.detalleInsumo}",
+                                fontSize = 13.sp,
+                                color = Color(0xFF50372B)
+                            )
+
+                            if(evento.comprobantePath.isNotBlank()){
+                                val archivo = remember(evento.comprobantePath) {
+                                    File(evento.comprobantePath)
+                                }
+                                if(archivo.exists()){
+                                    val bitmap = remember(evento.comprobantePath) {
+                                        BitmapFactory.decodeFile(archivo.absolutePath)?.asImageBitmap()
+                                    }
+                                    if(bitmap!=null){
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text(
+                                            text = "Comprobante adjunto:",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF503372B)
+                                        )
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Image(
+                                            bitmap = bitmap,
+                                            contentDescription = "Comprobante de transferencia",
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFF5F5F5))
+                                        )
+                                    }
+                                }
+                            }else{
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Sin comprobante adjunto aún",
+                                    fontSize = 13.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Button(
+                                    onClick = {onAprueboPago(evento.id)},
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Aprobar", fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                                Button(
+                                    onClick = {onRechazoPago(evento.id)},
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828)),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                ){
+                                    Text("Rechazar", fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(18.dp))
@@ -250,6 +341,8 @@ fun AdminScreenPreview() {
         ),
         onRutChanged = {},
         onBuscarPorRut = {},
+        onAprueboPago = {},
+        onRechazoPago = {},
         onLogout = {}
     )
 }

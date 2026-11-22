@@ -8,7 +8,7 @@ import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.dao.UsuarioDao
 import kotlin.concurrent.Volatile
 
-@Database(entities = [UsuarioEntity::class], version = 1, exportSchema = false)
+@Database(entities = [UsuarioEntity::class], version = 2, exportSchema = false)
 abstract class UserDatabase: RoomDatabase() {
 
     abstract fun UsuarioDao(): UsuarioDao
@@ -23,7 +23,9 @@ abstract class UserDatabase: RoomDatabase() {
                     context.applicationContext,
                     UserDatabase::class.java,
                     "user_database.db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(dropAllTables = true)
+                    .build()
                 INSTANCE = instance
                 instance
             }

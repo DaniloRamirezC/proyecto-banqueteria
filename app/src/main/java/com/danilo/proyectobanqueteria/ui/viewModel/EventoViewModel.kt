@@ -193,11 +193,23 @@ class EventoViewModel: ViewModel() {
         errorMensaje = null
     }
 
+    fun cargarReservas(context: Context){
+        viewModelScope.launch {
+            val db = EventDatabase.getEventDatabase(context)
+            db.EventoDao().getAllEvents().collect { entities ->
+                val resultado = mutableListOf<EventoModel>()
+                for (i in entities.indices){
+                    resultado.add(mapearEntidadModel(entities[i]))
+                }
+                listaReservas = resultado
+            }
+        }
+    }
+
     fun buscarReservasPorRut(context: Context, rut: String = rutBusqueda) {
         val rutLimpio = rut.trim()
         if (rutLimpio.isBlank()) {
-            listaReservas = emptyList()
-            errorMensaje = "Por favor, ingresa un RUT"
+            cargarReservas(context)
             return
         }
 
@@ -206,20 +218,7 @@ class EventoViewModel: ViewModel() {
             val entidad: EventoEntity? = db.EventoDao().getEventByRut(rutLimpio)
             if (entidad != null) {
                 errorMensaje = null
-                listaReservas = listOf(
-                    EventoModel(
-                        nombre = entidad.nombre,
-                        rut = entidad.rut,
-                        empresa = entidad.empresa,
-                        telefono = entidad.telefono,
-                        email = entidad.email,
-                        tipoEvento = entidad.tipoEvento,
-                        fecha = entidad.fecha,
-                        horario = entidad.horario,
-                        asistentes = entidad.asistentes,
-                        observaciones = entidad.observaciones
-                    )
-                )
+                listaReservas = listOf(mapearEntidadModel(entidad))
             } else {
                 listaReservas = emptyList()
                 errorMensaje = "No se encontró ninguna reserva con ese RUT"
@@ -227,9 +226,46 @@ class EventoViewModel: ViewModel() {
         }
     }
 
+    fun cambiarEstadoRevision(context: Context, eventoId: Int, estadoNuevo: String){
+        viewModelScope.launch {
+            val db = EventDatabase.getEventDatabase(context)
+            db.EventoDao().actualizarEstadoRevision(eventoId,estadoNuevo)
+
+            val actualizado = mutableListOf<EventoModel>()
+            for (i in listaReservas.indices){
+                val item = listaReservas[i]
+                if(item.id == eventoId){
+                    actualizado.add(item.copy(estadoRevision = estadoNuevo))
+                }else{
+                    actualizado.add(item)
+                }
+            }
+            listaReservas = actualizado
+        }
+    }
+
     fun limpiarBusquedaAdmin() {
         rutBusqueda = ""
         listaReservas = emptyList()
         errorMensaje = null
+    }
+
+    private fun mapearEntidadModel(entidad: EventoEntity): EventoModel{
+        return EventoModel(
+            id = entidad.id,
+            nombre = entidad.nombre,
+            rut = entidad.rut,
+            empresa = entidad.empresa,
+            telefono = entidad.telefono,
+            email = entidad.email,
+            tipoEvento = entidad.tipoEvento,
+            pastel = entidad.pastel,
+            asistentes = entidad.asistentes,
+            observaciones = entidad.observaciones,
+            comprobantePath = entidad.comprobantePath,
+            estadoAbono = entidad.estadoAbono,
+            fechaPago = entidad.fechaPago,
+            estadoRevision = entidad.estadoRevision
+        )
     }
 }

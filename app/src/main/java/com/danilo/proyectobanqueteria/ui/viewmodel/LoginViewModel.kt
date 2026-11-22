@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
 import com.danilo.proyectobanqueteria.model.LoginModel
 import com.danilo.proyectobanqueteria.ui.natives.vibracion
@@ -16,8 +17,8 @@ class LoginViewModel : ViewModel() {
         private set
     var errorMessage by mutableStateOf<String?>(null)
         private set
-    private val correoAdmin = "admin@paolicias.cl"
-    private val claveAdmin = "1234"
+    var usuarioActual by mutableStateOf<UsuarioEntity?>(null)
+        private set
     fun onEmailChanged(email: String) {
         uiState = uiState.copy(email = email)
         errorMessage = null
@@ -27,7 +28,7 @@ class LoginViewModel : ViewModel() {
         errorMessage = null
     }
     fun esAdmin(): Boolean {
-        return uiState.email.trim().equals(correoAdmin, ignoreCase = true)
+        return usuarioActual?.rol == "ADMIN"
     }
     fun onLoginClick(context: Context, onSuccess: () -> Unit) {
         val email = uiState.email.trim()
@@ -37,24 +38,16 @@ class LoginViewModel : ViewModel() {
             vibracion(context)
             return
         }
-        if (email.equals(correoAdmin, ignoreCase = true)) {
-            if (password == claveAdmin) {
-                errorMessage = null
-                onSuccess()
-            } else {
-                errorMessage = "Correo o contraseña incorrectos"
-                vibracion(context)
-            }
-            return
-        }
         viewModelScope.launch {
             val db = UserDatabase.getDatabase(context)
             val user = db.UsuarioDao().getUserByEmail(email)
 
             if (user != null && user.contrasena == password) {
+                usuarioActual = user
                 errorMessage = null
                 onSuccess()
             } else {
+                usuarioActual = null
                 errorMessage = "Correo o contraseña incorrectos"
                 vibracion(context)
             }

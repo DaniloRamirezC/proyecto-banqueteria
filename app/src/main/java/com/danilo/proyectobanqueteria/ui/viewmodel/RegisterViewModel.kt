@@ -36,8 +36,9 @@ class RegisterViewModel: ViewModel(){
 
     fun onRegisterClick(context: Context, onSuccess:() -> Unit){
         val state = uiState
+        val email = state.email.trim()
 
-        if(state.name.isBlank() || state.email.isBlank() || state.password.isBlank()){
+        if(state.name.isBlank() || email.isBlank() || state.password.isBlank()){
             uiState = uiState.copy(errorMessage = "Por favor completa todos los campos")
             vibracion(context)
             return
@@ -51,16 +52,23 @@ class RegisterViewModel: ViewModel(){
 
         viewModelScope.launch {
             val db = UserDatabase.getDatabase(context)
-            val existingUser = db.UsuarioDao().getUserByEmail(state.email)
+            val existingUser = db.UsuarioDao().getUserByEmail(email)
 
             if(existingUser!=null){
                 uiState = uiState.copy(errorMessage = "El correo ya está registrado")
                 vibracion(context)
             }else{
+                val rol = if(email.endsWith("@paolicias.cl", ignoreCase = true)){
+                    "ADMIN"
+                }else{
+                    "CLIENTE"
+                }
+
                 val nuevoUser = UsuarioEntity(
-                    nombre = state.name,
-                    email = state.email,
-                    contrasena = state.password
+                    nombre = state.name.trim(),
+                    email = email,
+                    contrasena = state.password,
+                    rol = rol
                 )
                 db.UsuarioDao().registerUser(nuevoUser)
                 uiState = uiState.copy(errorMessage = null)
