@@ -110,6 +110,12 @@ fun BanqueteriaNavigation(){
             CatalogoScreen(
                 onNavigateToCotizar = {
                     navController.navigate(Routes.REGISTER_EVENT)
+                },
+                onLogout = {
+                    eventoViewModel.uiState = EventoModel()
+                    navController.navigate(Routes.LOGIN){
+                        popUpTo(Routes.CATALOG){inclusive = true}
+                    }
                 }
             )
         }

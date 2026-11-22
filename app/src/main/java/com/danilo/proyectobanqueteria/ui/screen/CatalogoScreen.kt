@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,17 +14,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,9 +95,68 @@ private val fondo = Color(0xFFE6C196)
 private val crema = Color(0xFFFFF8EF)
 
 @Composable
-fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
+fun CatalogoScreen(
+    onNavigateToCotizar: () -> Unit,
+    onLogout: ()->Unit
+) {
+    var mostrarSalir by remember { mutableStateOf(false) }
+    if(mostrarSalir){
+        AlertDialog(
+            onDismissRequest = {mostrarSalir = false},
+            containerColor = crema,
+            title = {
+                Text(
+                    text = "Cerrar sesión",
+                    fontWeight = FontWeight.Bold,
+                    color = terracota
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Está seguro que desea cerrar sesión?",
+                    color = Color(0xFF50372B)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarSalir = false
+                        onLogout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = terracota)
+                ) {
+                    Text("Sí, salir", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {mostrarSalir = false}) {
+                    Text("Cancelar", color = Color(0xFF50372B), fontWeight = FontWeight.SemiBold)
+                }
+            }
+        )
+    }
+
     Scaffold(
-        topBar = { Header(title = "Catálogo de menús") },
+        topBar = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Header(title = "Catálogo de menús")
+                IconButton(
+                    onClick = {mostrarSalir = true},
+                    modifier = Modifier.padding(end = 12.dp)
+                        .statusBarsPadding()
+                        .padding(end = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "Cerrar sesión",
+                        tint = terracota
+                    )
+                }
+            }
+        },
         bottomBar = { Footer() },
         containerColor = fondo
     ) { innerPadding ->
@@ -184,5 +258,6 @@ fun CatalogoScreen(onNavigateToCotizar: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun CatalogoScreenPreview() {
-    CatalogoScreen(onNavigateToCotizar = {})
+    CatalogoScreen(onNavigateToCotizar = {},
+        onLogout = {})
 }
