@@ -1,78 +1,99 @@
 package com.danilo.proyectobanqueteria.ui.viewModel
 
-import android.util.Log
 import android.content.Context
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import com.danilo.proyectobanqueteria.model.RegisterModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danilo.proyectobanqueteria.data.ClienteCatalogoApi
 import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
+import com.danilo.proyectobanqueteria.model.RegisterModel
 import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
 
-class RegisterViewModel: ViewModel(){
-
+class RegisterViewModel : ViewModel() {
     var uiState by mutableStateOf(RegisterModel())
         private set
+    var isLoading by mutableStateOf(false)
+        private set
 
-    fun onNameChanged(name: String){
-        uiState = uiState.copy(name=name, errorMessage = null)
-    }
+    fun onNameChanged(value: String) { uiState = uiState.copy(name = value, errorMessage = null) }
+    fun onRutChanged(value: String) { uiState = uiState.copy(rut = value, errorMessage = null) }
+    fun onCompanyChanged(value: String) { uiState = uiState.copy(company = value, errorMessage = null) }
+    fun onPhoneChanged(value: String) { uiState = uiState.copy(phone = value, errorMessage = null) }
+    fun onEmailChanged(value: String) { uiState = uiState.copy(email = value, errorMessage = null) }
+    fun onPasswordChanged(value: String) { uiState = uiState.copy(password = value, errorMessage = null) }
+    fun onConfirmPasswordChanged(value: String) { uiState = uiState.copy(confirmPassword = value, errorMessage = null) }
 
-    fun onEmailChanged(email: String){
-        uiState = uiState.copy(email=email, errorMessage = null)
-    }
-
-    fun onPasswordChanged(password: String){
-        uiState = uiState.copy(password=password, errorMessage = null)
-    }
-
-    fun onConfirmPasswordChanged(confirmPassword: String){
-        uiState = uiState.copy(confirmPassword=confirmPassword, errorMessage = null)
-    }
-
-    fun onRegisterClick(context: Context, onSuccess:() -> Unit){
+    fun onRegisterClick(context: Context, onSuccess: () -> Unit) {
         val state = uiState
         val email = state.email.trim()
-
-        if(state.name.isBlank() || email.isBlank() || state.password.isBlank()){
+        if (state.name.isBlank() || email.isBlank() || state.password.isBlank()) {
             uiState = uiState.copy(errorMessage = "Por favor completa todos los campos")
             vibracion(context)
             return
         }
-
-        if(state.password != state.confirmPassword){
+        val esAdmin = email.endsWith("@paolicias.cl", ignoreCase = true)
+        if (!esAdmin && (state.rut.isBlank() || state.phone.isBlank())) {
+            uiState = uiState.copy(errorMessage = "Completa tu RUT y teléfono para registrar tus datos de cliente")
+            vibracion(context)
+            return
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            uiState = uiState.copy(errorMessage = "Ingresa un correo electrónico válido")
+            vibracion(context)
+            return
+        }
+        if (state.password != state.confirmPassword) {
             uiState = uiState.copy(errorMessage = "Las contraseñas no coinciden")
             vibracion(context)
             return
         }
-
+        if (isLoading) return
+        isLoading = true
         viewModelScope.launch {
-            val db = UserDatabase.getDatabase(context)
-            val existingUser = db.UsuarioDao().getUserByEmail(email)
-
-            if(existingUser!=null){
-                uiState = uiState.copy(errorMessage = "El correo ya está registrado")
-                vibracion(context)
-            }else{
-                val rol = if(email.endsWith("@paolicias.cl", ignoreCase = true)){
-                    "ADMIN"
-                }else{
-                    "CLIENTE"
+            try {
+                val db = UserDatabase.getDatabase(context)
+                val existingUser = db.UsuarioDao().getUserByEmail(email)
+                if (existingUser != null) {
+                    uiState = uiState.copy(errorMessage = "El correo ya está registrado")
+                    vibracion(context)
+                    return@launch
                 }
-
+                // Las cuentas CLIENTE crean primero su perfil en el microservicio.
+                // Las cuentas ADMIN siguen usando el registro local ya existente.
+                if (!esAdmin) {
+                    ClienteCatalogoApi.registrarCliente(
+                        nombre = state.name,
+                        rut = state.rut,
+                        empresa = state.company,
+                        telefono = state.phone,
+                        email = email
+                    )
+                }
                 val nuevoUser = UsuarioEntity(
                     nombre = state.name.trim(),
                     email = email,
                     contrasena = state.password,
-                    rol = rol
+                    rol = if (esAdmin) "ADMIN" else "CLIENTE"
                 )
                 db.UsuarioDao().registerUser(nuevoUser)
                 uiState = uiState.copy(errorMessage = null)
                 onSuccess()
+            } catch (e: Exception) {
+                val message = e.message.orEmpty()
+                uiState = uiState.copy(errorMessage = when {
+                    message.contains("Unable to resolve", true) || message.contains("failed to connect", true) || message.contains("Connection refused", true) ->
+                        "No se pudo conectar con el backend. Verifica que los microservicios estén encendidos y ejecuta adb reverse."
+                    message.contains("duplicate", true) || message.contains("unique", true) || message.contains("409", true) ->
+                        "El RUT o correo ya está registrado en el sistema."
+                    else -> "No se pudo registrar el cliente: ${message.take(180)}"
+                })
+                vibracion(context)
+            } finally {
+                isLoading = false
             }
         }
     }

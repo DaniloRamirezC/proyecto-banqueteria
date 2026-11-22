@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +66,37 @@ fun RegisterScreen(
                 value = state.name,
                 onValueChange = {viewModel.onNameChanged(it)},
                 label = {Text("Nombre Completo")},
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = state.rut,
+                onValueChange = { viewModel.onRutChanged(it) },
+                label = { Text("RUT") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = state.phone,
+                onValueChange = { viewModel.onPhoneChanged(it) },
+                label = { Text("Teléfono") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = state.company,
+                onValueChange = { viewModel.onCompanyChanged(it) },
+                label = { Text("Empresa (opcional)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -127,12 +159,17 @@ fun RegisterScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !viewModel.isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFCB522E),
                     contentColor = Color.White
                 )
             ) {
-                Text( text = "Registrarse")
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.height(18.dp))
+                } else {
+                    Text(text = "Registrarse")
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
