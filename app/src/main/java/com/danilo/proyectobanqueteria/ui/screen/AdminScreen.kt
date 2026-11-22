@@ -224,22 +224,6 @@ fun AdminScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
-                onClick = onLogout,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57E41)),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .shadow(5.dp, shape = CircleShape)
-                    .height(48.dp)
-            ) {
-                Text(
-                    text = "Cerrar sesión",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-            }
         }
     }
 }

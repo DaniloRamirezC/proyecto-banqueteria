@@ -21,6 +21,7 @@ import com.danilo.proyectobanqueteria.ui.screen.RegisterScreen
 import com.danilo.proyectobanqueteria.ui.screen.RegistroEventoScreen
 import com.danilo.proyectobanqueteria.ui.screen.ResumenEventoScreen
 import com.danilo.proyectobanqueteria.ui.viewModel.EventoViewModel
+import com.danilo.proyectobanqueteria.ui.viewModel.LoginViewModel
 
 object Routes{
     const val BANQUETER = "Banqueteria"
@@ -86,18 +87,25 @@ fun BanqueteriaNavigation(){
 
         }
         composable(Routes.LOGIN) {
+            val loginViewModel: LoginViewModel = viewModel()
             LoginScreen(
+                viewModel = loginViewModel,
                 onNavigateToRegister = {
                     navController.navigate(Routes.REGISTER_USER)
                 },
                 onLoginSuccess = {
-                    navController.navigate(Routes.CATALOG){
-                        popUpTo(Routes.LOGIN) {inclusive = true}
+                    val destino = if (loginViewModel.esAdmin()) {
+                        Routes.ADMIN
+                    } else {
+                        Routes.CATALOG
+                    }
+                    navController.navigate(destino) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
             )
-
         }
+
         composable(Routes.CATALOG){
             CatalogoScreen(
                 onNavigateToCotizar = {
