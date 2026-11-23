@@ -154,6 +154,9 @@ fun BanqueteriaNavigation(){
                 onRechazoPago = { eventoId ->
                     eventoViewModel.cambiarEstadoRevision(context,eventoId,"Rechazado")
                 },
+                onOcultarReserva = { eventoId ->
+                    eventoViewModel.ocultarReservaEnVista(eventoId)
+                },
                 onLogout = {
                     eventoViewModel.limpiarBusquedaAdmin()
                     eventoViewModel.uiState = EventoModel()

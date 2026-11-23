@@ -59,6 +59,7 @@ fun AdminScreen(
     onBuscarPorRut: () -> Unit,
     onAprueboPago: (Int) -> Unit,
     onRechazoPago: (Int) -> Unit,
+    onOcultarReserva: (Int) -> Unit,
     onLogout: () -> Unit
 ) {
     val moneda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"))
@@ -201,7 +202,13 @@ fun AdminScreen(
                             if (evento.horario.isNotBlank()) {
                                 DetalleEvento("Horario: ", evento.horario)
                             }
-                            DetalleEvento("Asistentes: ", "${evento.asistentes} personas")
+                            if (evento.esPasteleria) {
+                                if (evento.pastel.isNotBlank()) {
+                                    DetalleEvento("Pastel: ", evento.pastel)
+                                }
+                            } else {
+                                DetalleEvento("Asistentes: ", "${evento.asistentes} personas")
+                            }
                             if (evento.observaciones.isNotBlank()) {
                                 DetalleEvento("Observaciones: ", evento.observaciones)
                             }
@@ -266,7 +273,7 @@ fun AdminScreen(
                                             text = "Comprobante adjunto:",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF503372B)
+                                            color = Color(0xFF50372B)
                                         )
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Image(
@@ -311,6 +318,19 @@ fun AdminScreen(
                                     Text("Rechazar", fontWeight = FontWeight.Bold, color = Color.White)
                                 }
                             }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                            OutlinedButton(
+                                onClick = { onOcultarReserva(evento.id) },
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Quitar tarjeta de la vista",
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF50372B)
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(18.dp))
@@ -347,6 +367,7 @@ fun AdminScreenPreview() {
         onBuscarPorRut = {},
         onAprueboPago = {},
         onRechazoPago = {},
+        onOcultarReserva = {},
         onLogout = {}
     )
 }

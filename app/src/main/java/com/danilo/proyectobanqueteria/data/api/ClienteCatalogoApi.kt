@@ -9,7 +9,7 @@ import java.net.URL
 
 /** Comunicación con los microservicios existentes de cliente (8082) y catálogo (8081). */
 object ClienteCatalogoApi {
-    private const val HOST = "10.0.2.2"
+    private const val HOST = "184.197.196.174"
     private const val CLIENTES_URL = "http://$HOST:8082/api/clientes"
     private const val CATALOGO_URL = "http://$HOST:8081/api/catalogo"
     private const val PEDIDOS_URL = "http://$HOST:8083/api/pedidos"

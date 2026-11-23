@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val HOST = "10.0.2.2"
+    private const val HOST = "184.197.196.174"
 
     private const val URL_CATALOGO = "http://$HOST:8081/"
     private const val URL_CLIENTE  = "http://$HOST:8082/"

@@ -31,7 +31,9 @@ class LoginViewModel : ViewModel() {
         errorMessage = null
     }
     fun esAdmin(): Boolean {
-        return usuarioActual?.rol == "ADMIN"
+        val rol = usuarioActual?.rol?.trim().orEmpty()
+        return rol.equals("administrador", ignoreCase = true) ||
+                rol.equals("admin", ignoreCase = true)
     }
     fun onLoginClick(context: Context, onSuccess: () -> Unit) {
         val email = uiState.email.trim()

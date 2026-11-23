@@ -10,16 +10,16 @@ import retrofit2.http.Path
 
 interface ResumenApiService {
 
-    @GET("api/resumen")
+    @GET("api/resumenes")
     suspend fun listarResumenes(): List<ResumenDTO>
 
-    @GET("api/resumen/{id}")
+    @GET("api/resumenes/{id}")
     suspend fun obtenerResumen(@Path("id") id: Long): ResumenDTO
 
-    @GET("api/resumen/evento/{idEvento}")
+    @GET("api/resumenes/evento/{idEvento}")
     suspend fun listarResumenPorEvento(@Path("idEvento") idEvento: Long): List<ResumenDTO>
 
-    @POST("api/resumen")
+    @POST("api/resumenes")
     suspend fun crearResumen(@Body resumen: ResumenDTO): ResumenDTO
 
     @GET("api/comprobantes")

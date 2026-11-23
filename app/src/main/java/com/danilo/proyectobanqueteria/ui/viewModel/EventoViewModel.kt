@@ -130,6 +130,7 @@ class EventoViewModel: ViewModel() {
         }
     }
     fun onConfirmarClick(context: Context, onSuccess: ()-> Unit){
+        if (isLoading) return
         val state = uiState
         when{
             state.nombre.isBlank() -> {
@@ -174,12 +175,14 @@ class EventoViewModel: ViewModel() {
                 return
             }else ->{
                 errorAsistentes = false
-                if (state.empresa.isBlank()){
-                    uiState = uiState.copy(empresa = "No aplica")
-                }
             }
         }
+
+        val empresaFinal = state.empresa.trim().ifBlank { "No aplica" }
+        uiState = uiState.copy(empresa = empresaFinal)
+
         viewModelScope.launch {
+            isLoading = true
             try{
                 val db = EventDatabase.getEventDatabase(context)
                 val rutExistente = db.EventoDao().getEventByRut(state.rut)
@@ -194,7 +197,7 @@ class EventoViewModel: ViewModel() {
                     ?: BanqueteriaApi.registrarCliente(
                         nombre = state.nombre,
                         rut = state.rut,
-                        empresa = state.empresa.ifBlank { "No aplica" },
+                        empresa = empresaFinal,
                         telefono = state.telefono,
                         email = state.email
                     )
@@ -272,7 +275,10 @@ class EventoViewModel: ViewModel() {
             db.EventoDao().getAllEvents().collect { entities ->
                 val resultado = mutableListOf<EventoModel>()
                 for (i in entities.indices){
-                    resultado.add(mapearEntidadModel(entities[i]))
+                    val entidad = entities[i]
+                    if(entidad.id !in idsOcultosAdmin) {
+                        resultado.add(mapearEntidadModel(entidad))
+                    }
                 }
                 listaReservas = resultado
             }
@@ -301,21 +307,13 @@ class EventoViewModel: ViewModel() {
 
     fun cambiarEstadoRevision(context: Context, eventoId: Int, estadoNuevo: String){
         viewModelScope.launch {
+            val db = EventDatabase.getEventDatabase(context)
+            db.EventoDao().actualizarEstadoRevision(eventoId, estadoNuevo)
+            listaReservas = listaReservas.map { item ->
+                if (item.id == eventoId) item.copy(estadoRevision = estadoNuevo) else item
+            }
             try {
                 ClienteCatalogoApi.actualizarEstadoAdmin(eventoId,estadoNuevo)
-                val db = EventDatabase.getEventDatabase(context)
-                db.EventoDao().actualizarEstadoRevision(eventoId, estadoNuevo)
-
-                val actualizado = mutableListOf<EventoModel>()
-                for (i in listaReservas.indices) {
-                    val item = listaReservas[i]
-                    if (item.id == eventoId) {
-                        actualizado.add(item.copy(estadoRevision = estadoNuevo))
-                    } else {
-                        actualizado.add(item)
-                    }
-                }
-                listaReservas = actualizado
                 errorMensaje = null
             }catch (e: Exception){
                 errorMensaje = "No se pudo sincronizar el estado con el servidor: ${e.message?.take(120)}"
@@ -341,6 +339,7 @@ class EventoViewModel: ViewModel() {
             tipoEvento = entidad.tipoEvento,
             pastel = entidad.pastel,
             fecha = entidad.fecha,
+            horario = entidad.horario,
             asistentes = entidad.asistentes,
             observaciones = entidad.observaciones,
             comprobantePath = entidad.comprobantePath,
@@ -348,5 +347,12 @@ class EventoViewModel: ViewModel() {
             fechaPago = entidad.fechaPago,
             estadoRevision = entidad.estadoRevision
         )
+    }
+
+    private val idsOcultosAdmin = mutableSetOf<Int>()
+
+    fun ocultarReservaEnVista(eventoId: Int) {
+        idsOcultosAdmin.add(eventoId)
+        listaReservas = listaReservas.filterNot { it.id == eventoId }
     }
 }

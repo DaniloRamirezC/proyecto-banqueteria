@@ -43,11 +43,11 @@ data class EventoModel(
             else -> 0
         }
     val precioPastel: Int = when (pastel) {
-        "Torta de Chocolate" -> 15000
-        "Torta de Frutilla" -> 12000
-        "Torta Red Velvet" -> 28000
-        "Torta Manjar Nuez" -> 24000
-        "Torta de Limón Merengue" -> 30000
+        "Torta de Chocolate" -> 42000
+        "Torta de Frutilla" -> 45000
+        "Torta Red Velvet" -> 48000
+        "Torta Manjar Nuez" -> 44000
+        "Torta de Limón Merengue" -> 38000
         "Torta Tres Leches" -> 23000
         else -> 0
     }

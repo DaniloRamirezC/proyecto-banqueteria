@@ -88,7 +88,7 @@ object BanqueteriaApi {
                     nombreUsuario = nombreUsuario.trim(),
                     correo = correo.trim(),
                     contrasena = contrasena,
-                    nombreRol = if(esAdmin) "ADMIN" else "CLIENTE"
+                    nombreRol = if(esAdmin) "administrador" else "cliente"
                 )
             )
         }catch (e: HttpException){
