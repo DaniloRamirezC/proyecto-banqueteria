@@ -19,7 +19,7 @@ Proyecto desarrollado con lenguaje de programación Kotlin para la gestión inte
 
 ### 2. Microservicios y Puertos
 | Microservicio | Responsabilidad | Puerto | Base de datos | Tablas | Endpoints |
-| :---          | :---        | :---   | :---    | :---    | :--- | :--- |
+| :---          | :---        | :---   | :---    | :---    | :--- | 
 | `service-catalogo` | Gestión del servicio de banquetería y pastelería | 8081 | `bd_catalogo` | `categoria`, `menu` | GET, POST, PUT, DELETE |
 | `service-cliente`| Gestión de los datos del cliente | 8082 | `bd_cliente` | `cliente` | GET, PUT, POST, DELETE | 
 | `servicio-pedido`| Gestión de registro de evento y detalles | 8083 | `bd_pedido` | `evento`, `detalle_evento` | GET, POST | 
