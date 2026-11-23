@@ -73,7 +73,7 @@ class LoginViewModel : ViewModel() {
                     mensaje.contains("401") || mensaje.contains("403") || mensaje.contains("404") ->
                         "Correo o contraseña incorrectos"
                     mensaje.contains("Unable to resolve", true) || mensaje.contains("failed to connect", true) || mensaje.contains("Connection refused", true) ->
-                        "No se pudo conectar con el servidor de autenticación"
+                        "No se pudo conectar con el servicio de autenticación"
                     else -> "Error al iniciar sesión: ${mensaje.take(150)}"
                 }
                 vibracion(context)

@@ -94,7 +94,7 @@ class RegisterViewModel : ViewModel() {
                 val message = e.message.orEmpty()
                 uiState = uiState.copy(errorMessage = when {
                     message.contains("Unable to resolve", true) || message.contains("failed to connect", true) || message.contains("Connection refused", true) ->
-                        "No se pudo conectar con el servidor. Verifica que los microservicios estén encendidos."
+                        "No se pudo conectar con el servidor."
                     message.contains("duplicate", true) || message.contains("unique", true) || message.contains("409", true) ->
                         "El RUT o correo ya está registrado en el sistema."
                     else -> "No se pudo registrar el cliente: ${message.take(180)}"
