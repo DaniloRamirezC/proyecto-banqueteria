@@ -229,24 +229,28 @@ fun AdminScreen(
 
                             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-                            val estimacion = evento.estimacionOperativa
-                            Text(
-                                text = "Estimación Operativa",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFCB522E)
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            DetalleEvento("Tramo: ", estimacion.tramo)
-                            DetalleEvento("Garzones requeridos: ", "${estimacion.garzon}")
-                            DetalleEvento("Ayudantes de cocina: ", "${estimacion.ayudanteCocina}")
-                            DetalleEvento("Total staff: ", "${estimacion.totalEquipo} personas")
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Insumos: ${estimacion.detalleInsumo}",
-                                fontSize = 13.sp,
-                                color = Color(0xFF50372B)
-                            )
+                            evento.estimacionOperativa?.let { estimacion ->
+                                Text(
+                                    text = "Estimación Operativa",
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFCB522E)
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                DetalleEvento("Tramo: ", estimacion.tramo)
+                                DetalleEvento("Garzones requeridos: ", "${estimacion.garzon}")
+                                DetalleEvento(
+                                    "Ayudantes de cocina: ",
+                                    "${estimacion.ayudanteCocina}"
+                                )
+                                DetalleEvento("Total staff: ", "${estimacion.totalEquipo} personas")
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Insumos: ${estimacion.detalleInsumo}",
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF50372B)
+                                )
+                            }
 
                             if(evento.comprobantePath.isNotBlank()){
                                 val archivo = remember(evento.comprobantePath) {

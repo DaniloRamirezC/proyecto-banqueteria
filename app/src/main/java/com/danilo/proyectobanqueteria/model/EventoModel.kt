@@ -42,11 +42,26 @@ data class EventoModel(
             "Coffee Break" -> 8500
             else -> 0
         }
-    val totalEvento: Int = (precioPersona * 1.19 * asistentes).roundToInt()
+    val precioPastel: Int = when (pastel) {
+        "Torta de Chocolate" -> 15000
+        "Torta de Frutilla" -> 12000
+        "Torta Red Velvet" -> 28000
+        "Torta Manjar Nuez" -> 24000
+        "Torta de Limón Merengue" -> 30000
+        "Torta Tres Leches" -> 23000
+        else -> 0
+    }
+    val totalEvento: Int = if(esPasteleria){
+        precioPastel
+    }else {
+        (precioPersona * 1.19 * asistentes).roundToInt()
+    }
     val abonoEvento: Int = totalEvento/2
 
-    val estimacionOperativa: EstimacionOperativa
+    val estimacionOperativa: EstimacionOperativa?
         get() {
+            if(esPasteleria) return null
+
             val cantiAsistentes = asistentes.coerceIn(10,100)
             val garzon = if(esPasteleria) 0 else max(2, ceil(cantiAsistentes/15.0).toInt())
             val ayudanteCocina = max(1,ceil(cantiAsistentes/25.0).toInt())

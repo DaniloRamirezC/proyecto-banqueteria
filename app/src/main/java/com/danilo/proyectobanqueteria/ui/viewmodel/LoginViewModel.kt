@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danilo.proyectobanqueteria.data.BanqueteriaApi
 import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
 import com.danilo.proyectobanqueteria.model.LoginModel
@@ -13,6 +14,8 @@ import com.danilo.proyectobanqueteria.ui.natives.vibracion
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
+    var tokenJwt by mutableStateOf<String?>(null)
+        private set
     var uiState by mutableStateOf(LoginModel())
         private set
     var errorMessage by mutableStateOf<String?>(null)
@@ -39,16 +42,38 @@ class LoginViewModel : ViewModel() {
             return
         }
         viewModelScope.launch {
-            val db = UserDatabase.getDatabase(context)
-            val user = db.UsuarioDao().getUserByEmail(email)
+            try {
+                val respuesta = BanqueteriaApi.login(email,password)
+                tokenJwt = respuesta.token
 
-            if (user != null && user.contrasena == password) {
-                usuarioActual = user
+                val userRemoto = UsuarioEntity(
+                    id = respuesta.idUsuario?.toInt() ?: 0,
+                    nombre = respuesta.nombreUsuario,
+                    email = respuesta.correo,
+                    contrasena = password,
+                    rol = respuesta.rol
+                )
+                usuarioActual = userRemoto
+
+                val db = UserDatabase.getDatabase(context)
+                if(db.UsuarioDao().getUserByEmail(email) == null){
+                    db.UsuarioDao().registerUser(userRemoto)
+                }
+
                 errorMessage = null
                 onSuccess()
-            } else {
+
+            }catch (e: Exception){
                 usuarioActual = null
-                errorMessage = "Correo o contraseña incorrectos"
+                tokenJwt = null
+                val mensaje = e.message.orEmpty()
+                errorMessage = when{
+                    mensaje.contains("401") || mensaje.contains("403") || mensaje.contains("404") ->
+                        "Correo o contraseña incorrectos"
+                    mensaje.contains("Unable to resolve", true) || mensaje.contains("failed to connect", true) || mensaje.contains("Connection refused", true) ->
+                        "No se pudo conectar con el servidor de autenticación"
+                    else -> "Error al iniciar sesión: ${mensaje.take(150)}"
+                }
                 vibracion(context)
             }
         }

@@ -83,8 +83,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = state.phone,
-                onValueChange = { viewModel.onPhoneChanged(it) },
+                value = state.telefono,
+                onValueChange = { viewModel.onTelefonoChanged(it) },
                 label = { Text("Teléfono") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -94,8 +94,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = state.company,
-                onValueChange = { viewModel.onCompanyChanged(it) },
+                value = state.empresa,
+                onValueChange = { viewModel.onEmpresaChanged(it) },
                 label = { Text("Empresa (opcional)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()

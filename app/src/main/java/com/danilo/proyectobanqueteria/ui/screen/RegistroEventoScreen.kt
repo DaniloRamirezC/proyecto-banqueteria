@@ -99,7 +99,7 @@ fun RegistroEventoScreen(
         listOf("Mañana (09.00 - 13.00)", "Tarde (14.00 - 19.00)", "Noche (20.00 - 02.00)")
     }
     val listarAsistentes = (10..100 step 10).toList()
-    val listarPasteles = listOf("")
+    val listarPasteles = listOf("Torta de Chocolate", "Torta de Frutilla", "Torta Red Velvet", "Torta Manjar Nuez", "Torta de Limón Merengue", "Torta Tres Leches")
 
     val moneda = remember { NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"))}
 

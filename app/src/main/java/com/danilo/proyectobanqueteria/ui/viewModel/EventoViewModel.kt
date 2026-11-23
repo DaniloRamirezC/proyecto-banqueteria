@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danilo.proyectobanqueteria.data.BanqueteriaApi
+import com.danilo.proyectobanqueteria.data.api.ClienteCatalogoApi
 import com.danilo.proyectobanqueteria.data.local.entity.EventoEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.EventDatabase
 import com.danilo.proyectobanqueteria.model.EventoModel
@@ -26,6 +28,12 @@ class EventoViewModel: ViewModel() {
         private set
     var listaReservas by mutableStateOf<List<EventoModel>>(emptyList())
         private set
+    var isLoading by mutableStateOf(false)
+        private set
+
+    private var eventoRemotoId: Long? = null
+    private var resumenRemotoId: Long? = null
+    private var comprobanteRemotoId: Long? = null
 
     fun onNombreChanged(nombre: String){
         uiState = uiState.copy(nombre = nombre)
@@ -103,6 +111,20 @@ class EventoViewModel: ViewModel() {
                         estadoAbono =nuevoEstadoAbono,
                         fechaPago = fechaActual
                     )
+
+                    val idRes = resumenRemotoId
+                    if(idRes != null){
+                        try{
+                            val respComprobante = BanqueteriaApi.registrarComprobante(
+                                idResumen = idRes,
+                                estadoAbono = nuevoEstadoAbono,
+                                urlComprobante = rutaGuardada
+                            )
+                            comprobanteRemotoId = respComprobante.idComprobante
+                        }catch (e: Exception){
+                            errorMensaje = "Comprobante guardado localmente, pero falló envío a la nube: ${e.message?.take(120)}"
+                        }
+                    }
                 }
             }
         }
@@ -158,13 +180,54 @@ class EventoViewModel: ViewModel() {
             }
         }
         viewModelScope.launch {
-            val db = EventDatabase.getEventDatabase(context)
-            val rutExistente = db.EventoDao().getEventByRut(state.rut)
+            try{
+                val db = EventDatabase.getEventDatabase(context)
+                val rutExistente = db.EventoDao().getEventByRut(state.rut)
 
-            if(rutExistente!=null){
-                errorMensaje = "Este Rut ya existe"
-                vibracion(context)
-            }else{
+                if(rutExistente!=null) {
+                    errorMensaje = "Este Rut ya existe"
+                    vibracion(context)
+                    return@launch
+                }
+
+                val clienteRemoto = BanqueteriaApi.obtenerClientePorRut(state.rut)
+                    ?: BanqueteriaApi.registrarCliente(
+                        nombre = state.nombre,
+                        rut = state.rut,
+                        empresa = state.empresa.ifBlank { "No aplica" },
+                        telefono = state.telefono,
+                        email = state.email
+                    )
+                val clienteId = clienteRemoto.idCliente
+                    ?: throw IllegalStateException("El servidor no devolvió un ID de cliente válido")
+
+                val obsConPastel = if(state.esPasteleria){
+                    "Pastel: ${state.pastel}. ${state.observaciones}"
+                } else{
+                    state.observaciones
+                }
+
+                val eventoCreado = BanqueteriaApi.crearEvento(
+                    tipoEvento = state.tipoEvento,
+                    fecha = state.fecha,
+                    horario = state.horario,
+                    cantiPersonas = state.asistentes,
+                    observaciones = obsConPastel,
+                    clienteId = clienteId
+                )
+                eventoRemotoId = eventoCreado.idEvento
+
+                val idEvento = eventoCreado.idEvento
+                if (idEvento != null) {
+                    val precioUnitario = if(state.esPasteleria) state.precioPastel else 0
+                    val resumenCreado = BanqueteriaApi.crearResumen(
+                        idEvento = idEvento,
+                        precio = precioUnitario,
+                        cantiPersonas = state.asistentes
+                    )
+                    resumenRemotoId = resumenCreado.idResumen
+                }
+
                 val nuevoEvent = EventoEntity(
                     nombre = state.nombre,
                     rut = state.rut,
@@ -185,6 +248,16 @@ class EventoViewModel: ViewModel() {
                 db.EventoDao().registerEvent(nuevoEvent)
                 errorMensaje = null
                 onSuccess()
+            }catch (e: Exception){
+                val mensaje = e.message.orEmpty()
+                errorMensaje = when{
+                    mensaje.contains("failed to connect", true) || mensaje.contains("Connection refused", true) ->
+                        "No se pudo conectar con el servidor de pedidos"
+                    else -> "Error al registrar pedido en la nube: ${mensaje.take(150)}"
+                }
+                vibracion(context)
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -228,19 +301,26 @@ class EventoViewModel: ViewModel() {
 
     fun cambiarEstadoRevision(context: Context, eventoId: Int, estadoNuevo: String){
         viewModelScope.launch {
-            val db = EventDatabase.getEventDatabase(context)
-            db.EventoDao().actualizarEstadoRevision(eventoId,estadoNuevo)
+            try {
+                ClienteCatalogoApi.actualizarEstadoAdmin(eventoId,estadoNuevo)
+                val db = EventDatabase.getEventDatabase(context)
+                db.EventoDao().actualizarEstadoRevision(eventoId, estadoNuevo)
 
-            val actualizado = mutableListOf<EventoModel>()
-            for (i in listaReservas.indices){
-                val item = listaReservas[i]
-                if(item.id == eventoId){
-                    actualizado.add(item.copy(estadoRevision = estadoNuevo))
-                }else{
-                    actualizado.add(item)
+                val actualizado = mutableListOf<EventoModel>()
+                for (i in listaReservas.indices) {
+                    val item = listaReservas[i]
+                    if (item.id == eventoId) {
+                        actualizado.add(item.copy(estadoRevision = estadoNuevo))
+                    } else {
+                        actualizado.add(item)
+                    }
                 }
+                listaReservas = actualizado
+                errorMensaje = null
+            }catch (e: Exception){
+                errorMensaje = "No se pudo sincronizar el estado con el servidor: ${e.message?.take(120)}"
+                vibracion(context)
             }
-            listaReservas = actualizado
         }
     }
 
@@ -260,6 +340,7 @@ class EventoViewModel: ViewModel() {
             email = entidad.email,
             tipoEvento = entidad.tipoEvento,
             pastel = entidad.pastel,
+            fecha = entidad.fecha,
             asistentes = entidad.asistentes,
             observaciones = entidad.observaciones,
             comprobantePath = entidad.comprobantePath,

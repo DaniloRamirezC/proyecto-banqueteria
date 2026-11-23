@@ -50,7 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danilo.proyectobanqueteria.R
-import com.danilo.proyectobanqueteria.data.ClienteCatalogoApi
+import com.danilo.proyectobanqueteria.data.api.ClienteCatalogoApi
 import com.danilo.proyectobanqueteria.ui.components.Footer
 import com.danilo.proyectobanqueteria.ui.components.Header
 import kotlinx.coroutines.Dispatchers
@@ -81,8 +81,8 @@ private fun imagenParaMenu(nombre: String): Int {
     }
 }
 
-private fun precioChile(valor: Double): String =
-    NumberFormat.getCurrencyInstance(Locale("es", "CL")).format(valor)
+private fun precioChile(valor: Int): String =
+    NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL")).format(valor)
 
 @Composable
 fun CatalogoScreen(
@@ -127,7 +127,7 @@ fun CatalogoScreen(
             }
         } catch (e: Exception) {
             menus = emptyList()
-            error = "No se pudo cargar el catálogo. Comprueba que service-catalogo esté funcionando y vuelve a intentar."
+            error = "No se pudo cargar el catálogo. Comprueba que su microservicio esté funcionando y vuelve a intentar."
         } finally {
             cargando = false
         }

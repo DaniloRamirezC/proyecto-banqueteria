@@ -6,7 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.danilo.proyectobanqueteria.data.ClienteCatalogoApi
+import com.danilo.proyectobanqueteria.data.BanqueteriaApi
+import com.danilo.proyectobanqueteria.data.api.ClienteCatalogoApi
 import com.danilo.proyectobanqueteria.data.local.entity.UsuarioEntity
 import com.danilo.proyectobanqueteria.data.local.entity.database.UserDatabase
 import com.danilo.proyectobanqueteria.model.RegisterModel
@@ -21,8 +22,8 @@ class RegisterViewModel : ViewModel() {
 
     fun onNameChanged(value: String) { uiState = uiState.copy(name = value, errorMessage = null) }
     fun onRutChanged(value: String) { uiState = uiState.copy(rut = value, errorMessage = null) }
-    fun onCompanyChanged(value: String) { uiState = uiState.copy(company = value, errorMessage = null) }
-    fun onPhoneChanged(value: String) { uiState = uiState.copy(phone = value, errorMessage = null) }
+    fun onEmpresaChanged(value: String) { uiState = uiState.copy(empresa = value, errorMessage = null) }
+    fun onTelefonoChanged(value: String) { uiState = uiState.copy(telefono = value, errorMessage = null) }
     fun onEmailChanged(value: String) { uiState = uiState.copy(email = value, errorMessage = null) }
     fun onPasswordChanged(value: String) { uiState = uiState.copy(password = value, errorMessage = null) }
     fun onConfirmPasswordChanged(value: String) { uiState = uiState.copy(confirmPassword = value, errorMessage = null) }
@@ -36,7 +37,7 @@ class RegisterViewModel : ViewModel() {
             return
         }
         val esAdmin = email.endsWith("@paolicias.cl", ignoreCase = true)
-        if (!esAdmin && (state.rut.isBlank() || state.phone.isBlank())) {
+        if (!esAdmin && (state.rut.isBlank() || state.telefono.isBlank())) {
             uiState = uiState.copy(errorMessage = "Completa tu RUT y teléfono para registrar tus datos de cliente")
             vibracion(context)
             return
@@ -62,14 +63,21 @@ class RegisterViewModel : ViewModel() {
                     vibracion(context)
                     return@launch
                 }
+
+                BanqueteriaApi.registrarUsuario(
+                    nombreUsuario = state.name,
+                    correo = email,
+                    contrasena = state.password,
+                    esAdmin = esAdmin
+                )
                 // Las cuentas CLIENTE crean primero su perfil en el microservicio.
                 // Las cuentas ADMIN siguen usando el registro local ya existente.
                 if (!esAdmin) {
                     ClienteCatalogoApi.registrarCliente(
                         nombre = state.name,
                         rut = state.rut,
-                        empresa = state.company,
-                        telefono = state.phone,
+                        empresa = state.empresa,
+                        telefono = state.telefono,
                         email = email
                     )
                 }
@@ -86,7 +94,7 @@ class RegisterViewModel : ViewModel() {
                 val message = e.message.orEmpty()
                 uiState = uiState.copy(errorMessage = when {
                     message.contains("Unable to resolve", true) || message.contains("failed to connect", true) || message.contains("Connection refused", true) ->
-                        "No se pudo conectar con el backend. Verifica que los microservicios estén encendidos y ejecuta adb reverse."
+                        "No se pudo conectar con el servidor. Verifica que los microservicios estén encendidos."
                     message.contains("duplicate", true) || message.contains("unique", true) || message.contains("409", true) ->
                         "El RUT o correo ya está registrado en el sistema."
                     else -> "No se pudo registrar el cliente: ${message.take(180)}"
